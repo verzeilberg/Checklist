@@ -1,0 +1,21 @@
+<?php
+$this->headTitle('Add Checklist');
+$this->mainMenu()->setActiveItemId('checklistbeheer');
+$this->pageBreadcrumbs()->setItems([
+    'Beheer' => $this->url('beheer'),
+    'CheckList' => $this->url('beheer/checklist'),
+    'Add CheckList' => $this->url('beheer/checklist', ['action' => 'add'])
+]);
+$form->setAttributes(array(
+    'class' => 'form-horizontal',
+    'enctype' => 'multipart/form-data'
+));
+?>
+<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
+    <h1 id="index">ADD CHECKLIST ITEM</h1>
+</hgroup>
+<!-- Breadcrumbs -->
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <?= $this->pageBreadcrumbs()->render(); ?>
+</div>
+<p>Bestand wordt automatisch gedwonload.</p>

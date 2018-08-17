@@ -1,0 +1,224 @@
+<?php
+$this->headTitle('Show Checklist');
+$this->mainMenu()->setActiveItemId('checklistbeheer');
+$this->pageBreadcrumbs()->setItems([
+    'Beheer' => $this->url('beheer'),
+    'CheckList' => $this->url('beheer/checklist'),
+    'Show CheckList' => $this->url('beheer/checklist', ['action' => 'show'])
+]);
+?>
+<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
+    <h1 id="index">ITEMS FOR <?php echo $checklist->getName(); ?></h1>
+</hgroup>
+<p class="col-lg-12 col-md-12 col-sm-12">
+    <a class="btn btn-default" id="remove" href="#">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Verwijder geselecteerde items
+    </a>
+    <a class="btn btn-default" href="
+       <?= $this->url('beheer/checklistitem', ['action' => 'add', 'id' => $checklist->getId()]); ?>">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nieuwe checklist item
+    </a>
+    <a class="btn btn-default" href="
+       <?= $this->url('beheer/checklistitem', ['action' => 'import-example', 'id' => $checklist->getId()]); ?>">
+        <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download voorbeeld excel
+    </a>
+    &nbsp;
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
+        <span class="glyphicon glyphicon-import" aria-hidden="true"></span> Importeer items
+    </button>
+</p>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <table id="myTable" class="table table-condensed table-hover table-bordered tablesorter">
+        <thead>
+            <tr>
+                <th class="text-center sorter-false"><input type="checkbox" id="checkAll" name="checkAll" value="1" /></th>
+                <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
+                    <th><?php echo $fields->getName(); ?></th>
+                <?php } ?>
+                <th class="text-center sorter-false"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></th>
+            </tr>
+        </thead>
+        <tbody id="result">
+            <?php if (count($checklist->getCheckListItems()) > 0) { ?>
+                <?php foreach ($checklist->getCheckListItems() AS $item) { ?>
+                    <tr id="item-<?php echo $item->getId(); ?>">
+                        <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]" value="<?php echo $item->getId(); ?>" /></td>
+                        <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
+                            <td <?php echo ($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
+                                <?php
+                                if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
+                                    if ($item->getItemContent()[$fields->getFormFieldName()] == 1) {
+                                        echo '<i class="fas fa-check-square"></i>';
+                                    } else {
+                                        echo '<i class="far fa-square"></i>';
+                                    }
+                                } else {
+                                    echo $item->getItemContent()[$fields->getFormFieldName()];
+                                }
+                                ?>
+                            </td>
+                        <?php } ?>
+                        <td class="text-center">
+                            <a class="btn btn-sm btn-primary" href="
+                               <?= $this->url('beheer/checklistitem', ['action' => 'edit', 'id' => $item->getId()]); ?>">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit
+                            </a>
+                            &nbsp;
+                            <a class="btn btn-sm btn-primary" href="
+                               <?= $this->url('beheer/checklistitem', ['action' => 'delete', 'id' => $item->getId()]); ?>">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Verwijder
+                            </a>
+                        </td>
+                    </tr>
+                <?php } ?>
+            <?php } else { ?>
+                <tr>
+                    <td class="text-center" colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">Er zijn nog geen checklist items.</td>
+                </tr>
+            <?php } ?>         
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Importeer excel bestand</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="header"  name="header" value="1">
+                    <label class="form-check-label" for="header">Column headers in eerste rij</label>
+                </div>
+                <div class="input-group">
+                    <label class="input-group-addon btn btn-file">
+                        Browse&hellip; <input type="file" name="importfile"  accept=".xls,.xlsx" style="display: none;" >
+                    </label>
+                    <input type="text" class="form-control" name="importfileName" readonly>
+                    <input type="hidden" name="checklistid" value="<?php echo $checklist->getId(); ?>" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" id="upload" class="btn btn-primary">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').focus()
+        })
+
+        $(function () {
+            $("#myTable").tablesorter({
+                theme: 'metro-dark'
+            });
+        });
+
+        //Create well design file upload form file
+        $(document).on('change', ':file', function () {
+            var input = $(this),
+                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+
+            $('input[name=importfileName]').val(label);
+        });
+
+        $('#upload').on('click', function () {
+            var file_data = $('input[name=importfile]').prop('files')[0];
+            var checklistid = $('input[name=checklistid]').val();
+            var header = '';
+            if ($('input[name=header]').is(":checked")) {
+                header = 1;
+            }
+            var form_data = new FormData();
+            form_data.append('file', file_data);
+            form_data.append('checklistid', checklistid);
+            form_data.append('header', header);
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'uploadFile']); ?>',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    $(response.items).each(function (key, value) {
+                        $('#result').append(value);
+                    });
+                    $(function () {
+                        $('#myModal').modal('toggle');
+                    });
+                }
+            });
+
+
+
+        });
+
+        $('#checkAll').change(function (e) {
+            if ($(this).is(":checked")) {
+                $("input.delete-item").each(function (i) {
+                    $(this).prop('checked', true);
+                });
+            } else {
+                $("input.delete-item").each(function () {
+                    $(this).prop('checked', false);
+                });
+            }
+        });
+        /*
+         * Click funtion to remove selected items
+         */
+        $('#remove').click(function (e) {
+            e.preventDefault();
+            var itemsToDelete = []
+            $("input.delete-item").each(function (i) {
+                if ($(this).is(":checked")) {
+                    itemsToDelete.push($(this).val());
+                }
+            });
+
+            if (itemsToDelete.length > 0) {
+                var form_data = new FormData();
+                form_data.append('itemsToDelete', itemsToDelete);
+
+                $.ajax({
+                    url: '<?php echo $this->url('checklistajax', ['action' => 'delete-items']); ?>',
+                    dataType: 'json',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    async: true,
+                    type: 'post',
+                    success: function (response) {
+                        console.log(response.error);
+
+                        if (response.error === false) {
+                            $(response.deletedItems).each(function (index, value) {
+                                $('tr#item-' + value).slideUp("slow", function () {
+                                    // Animation complete.
+                                });
+                            });
+                            $('#checkAll').prop('checked', false);
+                        } else {
+                            alert(response.error_message);
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>

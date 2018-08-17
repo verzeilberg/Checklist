@@ -1,0 +1,65 @@
+<?php
+$this->headTitle('Add Checklist');
+$this->mainMenu()->setActiveItemId('checklistbeheer');
+$this->pageBreadcrumbs()->setItems([
+    'Beheer' => $this->url('beheer'),
+    'CheckList' => $this->url('beheer/checklist'),
+    'Add CheckList' => $this->url('beheer/checklist', ['action' => 'add'])
+]);
+$form->setAttributes(array(
+    'class' => 'form-horizontal',
+    'enctype' => 'multipart/form-data'
+));
+?>
+<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
+    <h1 id="index">ADD CHECKLIST ITEM</h1>
+</hgroup>
+<!-- Breadcrumbs -->
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <?= $this->pageBreadcrumbs()->render(); ?>
+</div>
+<?php echo $this->form()->openTag($form); ?>
+<?php foreach ($checkListFields AS $checkListField) { ?>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-10">
+            <div class="form-group">
+                <label class="col-md-4"><?php echo $checkListField->getName(); ?> <?php echo ($checkListField->getRequired() == 1? '*':'') ?></label>   
+                <div class="col-md-8">
+                    <?php 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'text') {
+                        echo $this->partial('partials/input-text.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'number') {
+                        echo $this->partial('partials/input-number.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'checkbox') {
+                        echo $this->partial('partials/input-checkbox.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'textarea') {
+                        echo $this->partial('partials/input-textarea.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'date') {
+                        echo $this->partial('partials/input-datum.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'email') {
+                        echo $this->partial('partials/input-email.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'time') {
+                        echo $this->partial('partials/input-time.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    if($checkListField->getChecklistFieldType()->getFormType() == 'url') {
+                        echo $this->partial('partials/input-url.phtml', array('checkListField'=>$checkListField));
+                    } 
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+?>
+<div class="col-sm-12 col-md-12 col-lg-12 " style="padding-left:0;">
+    <button type="submit" id="submit" class="btn btn-primary">Opslaan</button> 
+    <a href="<?php echo $this->url('beheer/checklist', ['action' => 'show', 'id' => $checklist->getId()]) ?>" class="btn btn-default" title="Annuleren">Annuleren</a>
+</div>  
+<?php echo $this->form()->closeTag($form); ?>

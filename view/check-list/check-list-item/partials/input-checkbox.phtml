@@ -1,0 +1,9 @@
+<?php
+$value = '';
+if(is_object($checklistitem))
+{
+    $values = $checklistitem->getItemContent();
+    $value = $values[$checkListField->getFormFieldName()];
+}
+?>
+<input <?php echo ($checkListField->getRequired() == 1? 'required':'') ?> <?php echo ($value == 1? 'checked':''); ?> value="1" type="<?php echo $checkListField->getChecklistFieldType()->getFormType(); ?>" name="<?php echo $checkListField->getFormFieldName(); ?>" /><br/>
