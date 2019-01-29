@@ -1,51 +1,64 @@
 <?php
 $this->headTitle('Show Checklist');
 $this->mainMenu()->setActiveItemId('checklistbeheer');
+$this->pageBreadcrumbs()->setLayout('beheer');
 $this->pageBreadcrumbs()->setItems([
     'Beheer' => $this->url('beheer'),
     'CheckList' => $this->url('beheer/checklist'),
     'Show CheckList' => $this->url('beheer/checklist', ['action' => 'show'])
 ]);
 ?>
-<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
-    <h1 id="index">ITEMS FOR <?php echo $checklist->getName(); ?></h1>
-</hgroup>
-<p class="col-lg-12 col-md-12 col-sm-12">
-    <a class="btn btn-default" id="remove" href="#">
-        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Verwijder geselecteerde items
-    </a>
-    <a class="btn btn-default" href="
+<!-- Page Header -->
+<div class="row">
+    <h1 class="col">ITEMS FOR <?php echo $checklist->getName(); ?></h1>
+</div>
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col">
+        <?= $this->pageBreadcrumbs()->render(); ?>
+    </div>
+</div>
+<!-- Page header options -->
+<div class="row mb-3">
+    <div class="col">
+        <a class="btn btn-danger" id="remove" href="#">
+            <i class="fas fa-trash-alt"></i> Verwijder geselecteerde items
+        </a>
+        <a class="btn btn-secondary" href="
        <?= $this->url('beheer/checklistitem', ['action' => 'add', 'id' => $checklist->getId()]); ?>">
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nieuwe checklist item
-    </a>
-    <a class="btn btn-default" href="
+            <i class="fas fa-plus-square"></i> Nieuwe checklist item
+        </a>
+        <a class="btn btn-secondary" href="
        <?= $this->url('beheer/checklistitem', ['action' => 'import-example', 'id' => $checklist->getId()]); ?>">
-        <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download voorbeeld excel
-    </a>
-    &nbsp;
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
-        <span class="glyphicon glyphicon-import" aria-hidden="true"></span> Importeer items
-    </button>
-</p>
-<div class="col-lg-12 col-md-12 col-sm-12">
-    <table id="myTable" class="table table-condensed table-hover table-bordered tablesorter">
-        <thead>
+            <i class="fas fa-download"></i> Download voorbeeld excel
+        </a>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+            <i class="fas fa-upload"></i> Importeer items
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table id="myTable" class="table table-dark table-sm table-bordered table-hover table-striped">
+            <thead class="thead-dark">
             <tr>
-                <th class="text-center sorter-false"><input type="checkbox" id="checkAll" name="checkAll" value="1" /></th>
+                <th class="text-center sorter-false"><input type="checkbox" id="checkAll" name="checkAll" value="1"/>
+                </th>
                 <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
                     <th><?php echo $fields->getName(); ?></th>
                 <?php } ?>
-                <th class="text-center sorter-false"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></th>
+                <th class="text-center"><i class="fas fa-cogs"></i></th>
             </tr>
-        </thead>
-        <tbody id="result">
+            </thead>
+            <tbody id="result">
             <?php if (count($checklist->getCheckListItems()) > 0) { ?>
                 <?php foreach ($checklist->getCheckListItems() AS $item) { ?>
                     <tr id="item-<?php echo $item->getId(); ?>">
-                        <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]" value="<?php echo $item->getId(); ?>" /></td>
+                        <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]"
+                                                       value="<?php echo $item->getId(); ?>"/></td>
                         <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
-                            <td <?php echo ($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
+                            <td <?php echo($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
                                 <?php
                                 if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
                                     if ($item->getItemContent()[$fields->getFormFieldName()] == 1) {
@@ -60,46 +73,51 @@ $this->pageBreadcrumbs()->setItems([
                             </td>
                         <?php } ?>
                         <td class="text-center">
-                            <a class="btn btn-sm btn-primary" href="
+                            <a class="btn btn-sm btn-secondary" href="
                                <?= $this->url('beheer/checklistitem', ['action' => 'edit', 'id' => $item->getId()]); ?>">
-                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit
+                                <i class="fas fa-edit"></i>
                             </a>
                             &nbsp;
-                            <a class="btn btn-sm btn-primary" href="
+                            <a class="btn btn-sm btn-danger" href="
                                <?= $this->url('beheer/checklistitem', ['action' => 'delete', 'id' => $item->getId()]); ?>">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Verwijder
+                                <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>
                     </tr>
                 <?php } ?>
             <?php } else { ?>
                 <tr>
-                    <td class="text-center" colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">Er zijn nog geen checklist items.</td>
+                    <td class="text-center" colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">Er zijn
+                        nog
+                        geen checklist items.
+                    </td>
                 </tr>
-            <?php } ?>         
-        </tbody>
-    </table>
+            <?php } ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content bg-dark">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="myModalLabel">Importeer excel bestand</h4>
             </div>
             <div class="modal-body">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="header"  name="header" value="1">
+                    <input type="checkbox" class="form-check-input" id="header" name="header" value="1">
                     <label class="form-check-label" for="header">Column headers in eerste rij</label>
                 </div>
                 <div class="input-group">
                     <label class="input-group-addon btn btn-file">
-                        Browse&hellip; <input type="file" name="importfile"  accept=".xls,.xlsx" style="display: none;" >
+                        Browse&hellip; <input type="file" name="importfile" accept=".xls,.xlsx" style="display: none;">
                     </label>
                     <input type="text" class="form-control" name="importfileName" readonly>
-                    <input type="hidden" name="checklistid" value="<?php echo $checklist->getId(); ?>" />
+                    <input type="hidden" name="checklistid" value="<?php echo $checklist->getId(); ?>"/>
                 </div>
             </div>
             <div class="modal-footer">
@@ -126,8 +144,8 @@ $this->pageBreadcrumbs()->setItems([
         //Create well design file upload form file
         $(document).on('change', ':file', function () {
             var input = $(this),
-                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
-                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
             input.trigger('fileselect', [numFiles, label]);
 
             $('input[name=importfileName]').val(label);
@@ -162,7 +180,6 @@ $this->pageBreadcrumbs()->setItems([
                     });
                 }
             });
-
 
 
         });

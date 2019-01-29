@@ -27,7 +27,7 @@ class CheckList extends UnityOfWork {
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      * @Annotation\Options({
      * "label": "Naam",
-     * "label_attributes": {"class": "col-sm-2 col-md-2 col-lg-2 control-label"}
+     * "label_attributes": {"class": ""}
      * })
      * @Annotation\Attributes({"class":"form-control", "placeholder":"Naam"})
      */
@@ -43,9 +43,9 @@ class CheckList extends UnityOfWork {
      * "1":"Publiek",
      * "2":"Persoonlijk",
      * },
-     * "label_attributes": {"class": "col-sm-2 col-md-2 col-lg-2 control-label"}
+     * "label_attributes": {"class": "form-check-label"}
      * })
-     * @Annotation\Attributes({"class":""})
+     * @Annotation\Attributes({"class":"form-check-input"})
      */
     protected $public;
 

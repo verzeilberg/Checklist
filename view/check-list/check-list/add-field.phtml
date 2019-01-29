@@ -1,6 +1,7 @@
 <?php
 $this->headTitle('Add Checklist');
 $this->mainMenu()->setActiveItemId('checklistbeheer');
+$this->pageBreadcrumbs()->setLayout('beheer');
 $this->pageBreadcrumbs()->setItems([
     'Beheer' => $this->url('beheer'),
     'CheckList' => $this->url('beheer/checklist', ['action' => 'add-field', 'id' => $checklist->getId()]),
@@ -11,109 +12,106 @@ $form->setAttributes(array(
     'enctype' => 'multipart/form-data'
 ));
 ?>
-<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
-    <h1 id="index">CHECKLIST: <?php echo $checklist->getName(); ?> </h1>
-</hgroup>
+<!-- Page Header -->
 <div class="row">
-    <!-- Breadcrumbs -->
-    <div class="col-lg-12 col-md-12 col-sm-12">
+    <h1 class="col">CHECKLIST: <?php echo $checklist->getName(); ?></h1>
+</div>
+<!-- Breadcrumbs -->
+<div class="row">
+    <div class="col">
         <?= $this->pageBreadcrumbs()->render(); ?>
     </div>
 </div>
-<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
-    <h1 id="index">FIELDS</h1>
-</hgroup>
-<table class="table table-condensed table-bordered table-hover">
-    <tr>
-        <th>Volgorde</th>
-        <th>Naam</th>
-        <th>Type</th>
-        <th class="text-center"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></th>
-    </tr>
-    <?php foreach ($checklist->getCheckListFields() AS $field) { ?>
-        <tr>
-            <td><?php echo $field->getOrder(); ?></td>
-            <td><?php echo $field->getName(); ?></td>
-            <td><?php echo $field->getChecklistFieldType()->getName(); ?></td>
-            <td class="text-center">
-                <a class="btn btn-primary" href="
+<!-- Second Page Header -->
+<div class="row">
+    <h1 class="col">FIELDS</h1>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-dark table-sm table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th>Volgorde</th>
+                <th>Naam</th>
+                <th>Type</th>
+                <th class="text-center"><i class="fas fa-cogs"></i></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($checklist->getCheckListFields() AS $field) { ?>
+                <tr>
+                    <td><?php echo $field->getOrder(); ?></td>
+                    <td><?php echo $field->getName(); ?></td>
+                    <td><?php echo $field->getChecklistFieldType()->getName(); ?></td>
+                    <td class="text-center">
+                        <a class="btn btn-sm btn-secondary" href="
                    <?= $this->url('beheer/checklist', ['action' => 'edit-field', 'id' => $field->getId()]); ?>">
-                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Wijzig
-                </a>
-                &nbsp;
-                <a class="btn btn-primary" href="
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        &nbsp;
+                        <a class="btn btn-sm btn-danger" href="
                    <?= $this->url('beheer/checklist', ['action' => 'delete-field', 'id' => $field->getId()]); ?>">
-                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Verwijder
-                </a>
-            </td>
-        </tr>
-    <?php } ?>
-</table>
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
-<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
-    <h1 id="index">CHECKLIST FIELDS</h1>
-</hgroup>
+<!-- THIRD Page Header -->
+<div class="row">
+    <h1 class="col">CHECKLIST FIELDS</h1>
+</div>
 <?php echo $this->form()->openTag($form); ?>
 <div class="row">
-    <div class="col-lg-10 col-md-10 col-sm-10">
+    <div class="col">
         <div class="form-group">
             <?php echo $this->formLabel($form->get('order')); ?>
-            <div class="col-sm-6 col-md-6 col-lg-6">
-                <?php echo $this->formNumber($form->get('order')); ?>
-            </div>
-            <div class="col-sm-5 col-md-5 col-lg-5">
-                <?php echo (count($form->getMessages('order')) > 0 ? $form->getMessages('order')['isEmpty'] : '&nbsp;' ) ?>
-            </div>
+            <?php echo $this->formNumber($form->get('order')); ?>
+            <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-10 col-md-10 col-sm-10">
+    <div class="col">
         <div class="form-group">
             <?php echo $this->formLabel($form->get('name')); ?>
-            <div class="col-sm-6 col-md-6 col-lg-6 form-check">
-                <?php echo $this->formText($form->get('name')); ?>
-            </div>
-            <div class="col-sm-5 col-md-5 col-lg-5">
-                <?php echo (count($form->getMessages('name')) > 0 ? $form->getMessages('name')['isEmpty'] : '&nbsp;' ) ?>
-            </div>
+            <?php echo $this->formText($form->get('name')); ?>
+            <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-10 col-md-10 col-sm-10">
+    <div class="col">
         <div class="form-group">
             <?php echo $this->formLabel($form->get('required')); ?>
-            <div class="col-sm-6 col-md-6 col-lg-6">
-                <?php echo $this->formCheckbox($form->get('required')); ?>
-            </div>
-            <div class="col-sm-5 col-md-5 col-lg-5">
-                <?php echo (count($form->getMessages('required')) > 0 ? $form->getMessages('required')['isEmpty'] : '&nbsp;' ) ?>
-            </div>
+            <?php echo $this->formCheckbox($form->get('required')); ?>
+            <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-10 col-md-10 col-sm-10">
+    <div class="col">
         <div class="form-group">
             <?php echo $this->formLabel($form->get('checklistFieldType')); ?>
-            <div class="col-sm-6 col-md-6 col-lg-6">
-                <?php echo $this->formSelect($form->get('checklistFieldType')); ?>
-            </div>
-            <div class="col-sm-5 col-md-5 col-lg-5">
-                <?php echo (count($form->getMessages('checklistFieldType')) > 0 ? $form->getMessages('checklistFieldType')['isEmpty'] : '&nbsp;' ) ?>
-            </div>
+            <?php echo $this->formSelect($form->get('checklistFieldType')); ?>
+            <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
         </div>
     </div>
 </div>
 
-
-
-<div class="col-sm-12 col-md-12 col-lg-12 " style="padding-left:0;">
-    <button type="submit" id="submit" class="btn btn-primary">Opslaan</button> 
-    <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-default" title="Annuleren">Annuleren</a>
-</div>  
+<div class="row">
+    <div class="col">
+        <button type="submit" id="submit" class="btn btn-dark">Opslaan</button>
+    </div>
+    <div class="col text-right">
+        <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-dark" title="Annuleren">Annuleren</a>
+    </div>
+</div>
 <?php echo $this->form()->closeTag($form); ?>
 
 <script>

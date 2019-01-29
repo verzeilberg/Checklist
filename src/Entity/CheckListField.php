@@ -26,7 +26,7 @@ class CheckListField extends UnityOfWork {
      * @ORM\Column(name="sort_order", type="integer", length=11, nullable=false)
      * @Annotation\Options({
      * "label": "Volgorde",
-     * "label_attributes": {"class": "col-sm-2 col-md-2 col-lg-2 control-label"}
+     * "label_attributes": {"class": ""}
      * })
      * @Annotation\Attributes({"class":"form-control"})
      */
@@ -36,7 +36,7 @@ class CheckListField extends UnityOfWork {
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      * @Annotation\Options({
      * "label": "Naam",
-     * "label_attributes": {"class": "col-sm-2 col-md-2 col-lg-2 control-label"}
+     * "label_attributes": {"class": ""}
      * })
      * @Annotation\Attributes({"class":"form-control", "placeholder":"Naam"})
      */
@@ -53,9 +53,9 @@ class CheckListField extends UnityOfWork {
      * @Annotation\Type("Zend\Form\Element\Checkbox")
      * @Annotation\Options({
      * "label": "Verplicht",
-     * "label_attributes": {"class": "col-sm-2 col-md-2 col-lg-2 control-label"}
+     * "label_attributes": {"class": "form-check-label"}
      * })
-     * @Annotation\Attributes({"class":"form-check-input"})
+     * @Annotation\Attributes({"class":""})
      */
     protected $required = 0;
 
@@ -76,7 +76,7 @@ class CheckListField extends UnityOfWork {
      * "target_class":"CheckList\Entity\CheckListFieldType",
      * "property": "name",
      * "label": "Veld type",
-     * "label_attributes": {"class": "col-sm-2 col-md-2 col-lg-2 control-label"},
+     * "label_attributes": {"class": ""},
      * })
      * @Annotation\Attributes({"class": "form-control"})
      */
