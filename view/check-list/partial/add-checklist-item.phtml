@@ -1,0 +1,145 @@
+<!-- Modal -->
+<div class="modal fade" id="addChecklistItem" tabindex="-1" role="dialog" aria-labelledby="addChecklistItemLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h4 class="modal-title" id="addChecklistItemLabel">Add checklist item</h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <?php echo $this->form()->openTag($form); ?>
+            <div class="modal-body">
+                <?php foreach ($checkListFields AS $checkListField) { ?>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label><?php echo $checkListField->getName(); ?><?php echo($checkListField->getRequired() == 1 ? '*' : '') ?></label>
+
+
+                                <?php
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'text') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-text.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'number') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-number.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'checkbox') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-checkbox.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'textarea') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-textarea.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'date') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-datum.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'email') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-email.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'time') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-time.phtml', array('checkListField' => $checkListField));
+                                }
+                                if ($checkListField->getChecklistFieldType()->getFormType() == 'url') {
+                                    echo $this->partial('check-list/check-list-item/partials/input-url.phtml', array('checkListField' => $checkListField));
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="addChecklistItemButton" class="btn btn-secondary">Opslaan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+            <?php echo $this->form()->closeTag($form); ?>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#addChecklistItemOpen').on('click', function (){
+
+        clearFormFields();
+
+        $(function () {
+            $('#addChecklistItem').modal('toggle');
+        });
+    });
+
+    $('.editChecklistItemOpen').on('click', function (){
+
+        clearFormFields();
+
+        var id = $(this).data('checklistitemid');
+
+        $.ajax({
+            url: '<?php echo $this->url('checklistajax', ['action' => 'getChecklistItem']); ?>',
+            dataType: 'json',
+            data: {
+                id: id
+            },
+            async: true,
+            type: 'post',
+            success: function (response) {
+
+                console.log(response.itemContent);
+
+                $(function () {
+                    $('#addChecklistItem').modal('toggle');
+                });
+            }
+        });
+
+
+
+        $(function () {
+            $('#addChecklistItem').modal('toggle');
+        });
+    });
+
+
+    $('#addChecklistItemButton').on('click', function () {
+        var formData = $("form#CheckListItem").serialize();
+
+        $.ajax({
+            url: '<?php echo $this->url('checklistajax', ['action' => 'addChecklistItem']); ?>',
+            dataType: 'json',
+            data: {
+                id: <?= $checklist->getId(); ?>,
+                formData: formData
+            },
+            async: true,
+            type: 'post',
+            success: function (response) {
+                var row = $('<tr id="item-'+ response.checkListItemId +'">');
+                row.append($('<td class="text-center">').html('<input class="delete-item" type="checkbox" name="checked-items[]" value="'+response.checkListItemId+'"/>'));
+                $.each(response.item, function( index, value ) {
+                    row.append($('<td>').html(value));
+                });
+                row.append($('<td class="text-center">').html('<a class="btn btn-sm btn-secondary" href="/beheer/checklistitem/edit/'+response.checkListItemId+'"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;&nbsp;<a class="btn btn-sm btn-danger" href="/beheer/checklistitem/delete/'+response.checkListItemId+'"><i class="fas fa-trash-alt"></i></a>'));
+                $('#myTable > tbody#result').append(row);
+
+                $(function () {
+                    $('#addChecklistItem').modal('toggle');
+                });
+            }
+        });
+
+
+    });
+
+    function clearFormFields()
+    {
+        $('form#CheckListItem input[type=text]').val('');
+        $('form#CheckListItem input[type=date]').val('');
+        $('form#CheckListItem input[type=number]').val('');
+        $('form#CheckListItem textarea').val('');
+        $('form#CheckListItem input[type=radio]').prop( "checked", false );
+        $('form#CheckListItem input[type=checkbox]').prop( "checked", false );
+
+    }
+</script>

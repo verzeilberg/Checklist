@@ -152,13 +152,15 @@ class CheckListItemController extends AbstractActionController {
 
     /**
      * Index action to show checklistst
-     * 
-     * @return Array()    
+     *
+     * @return Array()
      */
-    public function importExampleAction() {
+    public function exportListAction() {
         $this->layout('layout/beheer');
 
-        $id = (int) $this->params()->fromRoute('id', 0);
+        $id = (int) $this->params()->fromPost('id', 0);
+        $filters = (int) $this->params()->fromPost('filters', 0);
+        $freezeRow = (int) $this->params()->fromPost('freezeRow', 0);
         if (empty($id)) {
             return $this->redirect()->toRoute('beheer/checklist');
         }
@@ -179,7 +181,30 @@ class CheckListItemController extends AbstractActionController {
             $alphabeth = range('A', 'Z');
             foreach ($checkListFields AS $index => $checkListField) {
                 $worksheet->getCell($alphabeth[$index] . '1')->setValue($checkListField->getFormFieldName());
+                $worksheet->getStyle( $alphabeth[$index] . '1')->getFont()->setBold( true );
             }
+
+            //If filters is set than apply filters
+            if($filters == 1) {
+                $worksheet->setAutoFilter('A1:' . $alphabeth[$index] . '1');
+            }
+
+            //If freeze row is set than apply freeze pane for first row
+            if($freezeRow == 1) {
+                $worksheet->freezePane('A2');
+            }
+
+            $rowStart = 2;
+            foreach ($checklist->getCheckListItems() AS $index => $item) {
+                foreach ($checklist->getCheckListFields() as $fieldIndex => $fields) {
+
+                    $worksheet->getCell($alphabeth[$fieldIndex] . $rowStart)->setValue($item->getItemContent()[$fields->getFormFieldName()]);
+
+
+                }
+                $rowStart++;
+            }
+
 
             // redirect output to client browser
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

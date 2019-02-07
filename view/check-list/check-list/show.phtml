@@ -24,16 +24,21 @@ $this->pageBreadcrumbs()->setItems([
         <a class="btn btn-danger" id="remove" href="#">
             <i class="fas fa-trash-alt"></i> Verwijder geselecteerde items
         </a>
+        <!--
         <a class="btn btn-secondary" href="
        <?= $this->url('beheer/checklistitem', ['action' => 'add', 'id' => $checklist->getId()]); ?>">
             <i class="fas fa-plus-square"></i> Nieuwe checklist item
-        </a>
-        <a class="btn btn-secondary" href="
-       <?= $this->url('beheer/checklistitem', ['action' => 'import-example', 'id' => $checklist->getId()]); ?>">
-            <i class="fas fa-download"></i> Download voorbeeld excel
-        </a>
+        </a>-->
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+        <button type="button" class="btn btn-secondary" id="addChecklistItemOpen">
+            <i class="fas fa-plus-square"></i> Nieuwe checklist item
+        </button>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exportFile">
+            <i class="fas fa-upload"></i> Exporteer items
+        </button>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#importFile">
             <i class="fas fa-upload"></i> Importeer items
         </button>
     </div>
@@ -73,11 +78,9 @@ $this->pageBreadcrumbs()->setItems([
                             </td>
                         <?php } ?>
                         <td class="text-center">
-                            <a class="btn btn-sm btn-secondary" href="
-                               <?= $this->url('beheer/checklistitem', ['action' => 'edit', 'id' => $item->getId()]); ?>">
+                            <button data-checklistitemid="<?= $item->getId(); ?>" class="btn btn-sm btn-secondary editChecklistItemOpen">
                                 <i class="fas fa-edit"></i>
-                            </a>
-                            &nbsp;
+                            </button>
                             <a class="btn btn-sm btn-danger" href="
                                <?= $this->url('beheer/checklistitem', ['action' => 'delete', 'id' => $item->getId()]); ?>">
                                 <i class="fas fa-trash-alt"></i>
@@ -98,92 +101,27 @@ $this->pageBreadcrumbs()->setItems([
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content bg-dark">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="myModalLabel">Importeer excel bestand</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="header" name="header" value="1">
-                    <label class="form-check-label" for="header">Column headers in eerste rij</label>
-                </div>
-                <div class="input-group">
-                    <label class="input-group-addon btn btn-file">
-                        Browse&hellip; <input type="file" name="importfile" accept=".xls,.xlsx" style="display: none;">
-                    </label>
-                    <input type="text" class="form-control" name="importfileName" readonly>
-                    <input type="hidden" name="checklistid" value="<?php echo $checklist->getId(); ?>"/>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" id="upload" class="btn btn-primary">Upload</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Import file -->
+<?php
+echo $this->partial('check-list/partial/import-file.phtml', array('checklist' => $checklist));
+?>
+<!-- End Import file -->
+
+<!-- Export file -->
+<?php
+echo $this->partial('check-list/partial/export-file.phtml', array('checklist' => $checklist));
+?>
+<!-- End Export file -->
+
+<!-- Export file -->
+<?php
+echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
+?>
+<!-- End Export file -->
+
 
 <script>
     $(document).ready(function () {
-
-        $('#myModal').on('shown.bs.modal', function () {
-            $('#myInput').focus()
-        })
-
-        $(function () {
-            $("#myTable").tablesorter({
-                theme: 'metro-dark'
-            });
-        });
-
-        //Create well design file upload form file
-        $(document).on('change', ':file', function () {
-            var input = $(this),
-                numFiles = input.get(0).files ? input.get(0).files.length : 1,
-                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-            input.trigger('fileselect', [numFiles, label]);
-
-            $('input[name=importfileName]').val(label);
-        });
-
-        $('#upload').on('click', function () {
-            var file_data = $('input[name=importfile]').prop('files')[0];
-            var checklistid = $('input[name=checklistid]').val();
-            var header = '';
-            if ($('input[name=header]').is(":checked")) {
-                header = 1;
-            }
-            var form_data = new FormData();
-            form_data.append('file', file_data);
-            form_data.append('checklistid', checklistid);
-            form_data.append('header', header);
-            $.ajax({
-                url: '<?php echo $this->url('checklistajax', ['action' => 'uploadFile']); ?>',
-                dataType: 'json',
-                cache: false,
-                contentType: false,
-                processData: false,
-                data: form_data,
-                async: true,
-                type: 'post',
-                success: function (response) {
-                    $(response.items).each(function (key, value) {
-                        $('#result').append(value);
-                    });
-                    $(function () {
-                        $('#myModal').modal('toggle');
-                    });
-                }
-            });
-
-
-        });
-
         $('#checkAll').change(function (e) {
             if ($(this).is(":checked")) {
                 $("input.delete-item").each(function (i) {

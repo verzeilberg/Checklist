@@ -1,0 +1,41 @@
+<!-- Modal -->
+<div class="modal fade" id="exportFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Exporteer items</h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->url('beheer/checklistitem', ['action' => 'export-list']); ?>" method="post">
+                <div class="modal-body">
+
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="filters" name="filters" value="1">
+                        <label class="form-check-label" for="header">Add filters</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="freezeRow" name="freezeRow" value="1">
+                        <label class="form-check-label" for="header">Freeze first row</label>
+                    </div>
+                    <input type="hidden" name="id" value="<?= $checklist->getId(); ?>"/>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="submit" id="export" class="btn btn-secondary">Export</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#export").on("click", function () {
+        $(function () {
+            $('#exportFile').modal('toggle');
+        });
+    });
+</script>

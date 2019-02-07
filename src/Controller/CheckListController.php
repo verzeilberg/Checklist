@@ -124,8 +124,16 @@ class CheckListController extends AbstractActionController {
             return $this->redirect()->toRoute('beheer/checklist');
         }
 
+        $checkListFields = $checklist->getCheckListFields();
+
+        $checkListItem = $this->checkListItemService->createCheckListItem();
+        $form = $this->checkListItemService->createCheckListItemForm($checkListItem);
+
         return new ViewModel([
-            'checklist' => $checklist
+            'checklist' => $checklist,
+            'checkListFields' => $checkListFields,
+            'form' => $form
+
         ]);
     }
 

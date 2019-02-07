@@ -73,6 +73,8 @@ class checkListItemService implements checkListItemServiceInterface {
         $checklistitem->setChecklist($checklist);
         
         $this->storeCheckListItem($checklistitem);
+
+        return $checklistitem;
     }
 
     /**

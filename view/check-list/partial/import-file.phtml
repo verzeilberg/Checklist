@@ -1,0 +1,89 @@
+<!-- Modal -->
+<div class="modal fade" id="importFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h4 class="modal-title" id="importFileLabel">Importeer excel bestand</h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="header" name="header" value="1">
+                    <label class="form-check-label" for="header">Column headers in eerste rij</label>
+                </div>
+                <div class="input-group">
+                    <label class="sr-only" for="inlineFormInputGroup">File</label>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend input-group-addon">
+                            <label class="input-group-text  btn btn-file">
+                                Browse&hellip; <input type="file" name="importfile" accept=".xls,.xlsx"
+                                                      style="display: none;" multiple>
+                            </label>
+                        </div>
+                        <input type="text" class="form-control" name="importfileName" readonly>
+                    </div>
+                    <input type="hidden" name="checklistid" value="<?php echo $checklist->getId(); ?>"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" id="upload" class="btn btn-secondary">Upload</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+
+        $('#importFile').on('shown.bs.modal', function () {
+            $('#myInput').focus()
+        })
+
+        //Create well design file upload form file
+        $(document).on('change', ':file', function () {
+            var input = $(this),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+
+            $('input[name=importfileName]').val(label);
+        });
+
+        $('#upload').on('click', function () {
+            var file_data = $('input[name=importfile]').prop('files')[0];
+            var checklistid = $('input[name=checklistid]').val();
+            var header = '';
+            if ($('input[name=header]').is(":checked")) {
+                header = 1;
+            }
+            var form_data = new FormData();
+            form_data.append('file', file_data);
+            form_data.append('checklistid', checklistid);
+            form_data.append('header', header);
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'uploadFile']); ?>',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    $(response.items).each(function (key, value) {
+                        $('#result').append(value);
+                    });
+                    $(function () {
+                        $('#importFile').modal('toggle');
+                    });
+                }
+            });
+
+
+        });
+    });
+</script>
