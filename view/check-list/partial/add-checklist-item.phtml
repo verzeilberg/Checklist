@@ -10,6 +10,7 @@
                 </button>
             </div>
             <?php echo $this->form()->openTag($form); ?>
+            <input type="hidden" name="id" id="checkListItemId" value=""/>
             <div class="modal-body">
                 <?php foreach ($checkListFields AS $checkListField) { ?>
                     <div class="row">
@@ -61,85 +62,115 @@
 </div>
 
 <script>
-    $('#addChecklistItemOpen').on('click', function (){
+    $(document).ready(function () {
+        $('#addChecklistItemOpen').on('click', function () {
 
-        clearFormFields();
+            clearFormFields();
 
-        $(function () {
-            $('#addChecklistItem').modal('toggle');
+            $(function () {
+                $('#addChecklistItem').modal('toggle');
+            });
         });
+
+        $(document).on('click', '.editChecklistItemOpen', function () {
+
+            clearFormFields();
+
+            var id = $(this).data('checklistitemid');
+
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'getChecklistItem']); ?>',
+                dataType: 'json',
+                data: {
+                    id: id
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+
+                    $('input#checkListItemId').val(response.checkListItemId);
+                    $.each(response.itemContent, function (index, value) {
+                        if (value.fieldType == 'text' || value.fieldType == 'number') {
+                            $('input[name=' + index + ']').val(value.fieldvalue);
+                        }
+
+                        if (value.fieldType == 'textarea') {
+                            $('textarea[name=' + index + ']').val(value.fieldvalue);
+                        }
+
+                        if (value.fieldType == 'checkbox' || value.fieldType == 'radio') {
+                            if (value.fieldvalue == 1) {
+                                $('input[name=' + index + ']').prop("checked", true);
+                            } else {
+                                $('input[name=' + index + ']').prop("checked", false);
+                            }
+                        }
+                    });
+
+
+                    $(function () {
+                        $('#addChecklistItem').modal('toggle');
+                    });
+                }
+            });
+        });
+
+        //Click function to add/edit checklistitem
+        $('#addChecklistItemButton').on('click', function () {
+            //Get form data and serialize it
+            var formData = $("form#CheckListItem").serialize();
+
+            //Ajax call to add or edit checklist item. Based on given id.
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'addChecklistItem']); ?>',
+                dataType: 'json',
+                data: {
+                    id: <?= $checklist->getId(); ?>,
+                    formData: formData
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.action == 'add') { //If action is add than add a new row
+
+                        var row = $('<tr id="item-' + response.checkListItemId + '">');
+                        row.append($('<td class="text-center">').html('<input class="delete-item" type="checkbox" name="checked-items[]" value="' + response.checkListItemId + '"/>'));
+                        $.each(response.item, function (index, value) {
+                            if (index != 'id') {
+                                row.append($('<td id="'+response.checkListItemId+'_'+index+'">').html(value));
+                            }
+                        });
+                        //Create edit button
+                        var buttons = '<button data-checklistitemid="' + response.checkListItemId + '" class="btn btn-sm btn-secondary editChecklistItemOpen">';
+                        buttons += '<i class="fas fa-edit"></i>';
+                        buttons += '</button>&nbsp;';
+                        buttons += '<button data-checklistitemid="' + response.checkListItemId + '" class="btn btn-sm btn-danger removeChecklistItemOpen ">';
+                        buttons += '<i class="fas fa-trash-alt"></i>';
+                        buttons += '</button>';
+                        row.append($('<td class="text-center">').html(buttons));
+                        $('#myTable > tbody#result').append(row);
+                    } else { //If action is edit than edit a row with new values
+
+                        $.each(response.item, function (index, value) {
+                            $('td#' + response.checkListItemId + '_' + index).html(value);
+                        });
+                    }
+                    $(function () {
+                        $('#addChecklistItem').modal('toggle');
+                    });
+                }
+            });
+        });
+
+        function clearFormFields() {
+            $('form#CheckListItem input[type=text]').val('');
+            $('form#CheckListItem input[type=date]').val('');
+            $('form#CheckListItem input[type=number]').val('');
+            $('form#CheckListItem input[type=hidden]').val('');
+            $('form#CheckListItem textarea').val('');
+            $('form#CheckListItem input[type=radio]').prop("checked", false);
+            $('form#CheckListItem input[type=checkbox]').prop("checked", false);
+
+        }
     });
-
-    $('.editChecklistItemOpen').on('click', function (){
-
-        clearFormFields();
-
-        var id = $(this).data('checklistitemid');
-
-        $.ajax({
-            url: '<?php echo $this->url('checklistajax', ['action' => 'getChecklistItem']); ?>',
-            dataType: 'json',
-            data: {
-                id: id
-            },
-            async: true,
-            type: 'post',
-            success: function (response) {
-
-                console.log(response.itemContent);
-
-                $(function () {
-                    $('#addChecklistItem').modal('toggle');
-                });
-            }
-        });
-
-
-
-        $(function () {
-            $('#addChecklistItem').modal('toggle');
-        });
-    });
-
-
-    $('#addChecklistItemButton').on('click', function () {
-        var formData = $("form#CheckListItem").serialize();
-
-        $.ajax({
-            url: '<?php echo $this->url('checklistajax', ['action' => 'addChecklistItem']); ?>',
-            dataType: 'json',
-            data: {
-                id: <?= $checklist->getId(); ?>,
-                formData: formData
-            },
-            async: true,
-            type: 'post',
-            success: function (response) {
-                var row = $('<tr id="item-'+ response.checkListItemId +'">');
-                row.append($('<td class="text-center">').html('<input class="delete-item" type="checkbox" name="checked-items[]" value="'+response.checkListItemId+'"/>'));
-                $.each(response.item, function( index, value ) {
-                    row.append($('<td>').html(value));
-                });
-                row.append($('<td class="text-center">').html('<a class="btn btn-sm btn-secondary" href="/beheer/checklistitem/edit/'+response.checkListItemId+'"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;&nbsp;<a class="btn btn-sm btn-danger" href="/beheer/checklistitem/delete/'+response.checkListItemId+'"><i class="fas fa-trash-alt"></i></a>'));
-                $('#myTable > tbody#result').append(row);
-
-                $(function () {
-                    $('#addChecklistItem').modal('toggle');
-                });
-            }
-        });
-
-
-    });
-
-    function clearFormFields()
-    {
-        $('form#CheckListItem input[type=text]').val('');
-        $('form#CheckListItem input[type=date]').val('');
-        $('form#CheckListItem input[type=number]').val('');
-        $('form#CheckListItem textarea').val('');
-        $('form#CheckListItem input[type=radio]').prop( "checked", false );
-        $('form#CheckListItem input[type=checkbox]').prop( "checked", false );
-
-    }
 </script>

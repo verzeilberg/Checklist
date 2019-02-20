@@ -63,7 +63,7 @@ $this->pageBreadcrumbs()->setItems([
                         <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]"
                                                        value="<?php echo $item->getId(); ?>"/></td>
                         <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
-                            <td <?php echo($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
+                            <td id="<?= $item->getId() . '_' . $fields->getFormFieldName(); ?>" <?php echo($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
                                 <?php
                                 if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
                                     if ($item->getItemContent()[$fields->getFormFieldName()] == 1) {
@@ -81,10 +81,9 @@ $this->pageBreadcrumbs()->setItems([
                             <button data-checklistitemid="<?= $item->getId(); ?>" class="btn btn-sm btn-secondary editChecklistItemOpen">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <a class="btn btn-sm btn-danger" href="
-                               <?= $this->url('beheer/checklistitem', ['action' => 'delete', 'id' => $item->getId()]); ?>">
+                            <button data-checklistitemid="<?= $item->getId(); ?>" class="btn btn-sm btn-danger removeChecklistItemOpen ">
                                 <i class="fas fa-trash-alt"></i>
-                            </a>
+                            </button>
                         </td>
                     </tr>
                 <?php } ?>
@@ -175,5 +174,34 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
                 });
             }
         });
+
+
+        //Click function to remove checklistitem
+        $(document).on('click', '.removeChecklistItemOpen', function (){
+
+            var id = $(this).data('checklistitemid');
+
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'delete-item']); ?>',
+                dataType: 'json',
+                data: {
+                    id: id
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if(response.success == true) {
+                        $('tr#item-' + response.checklistItemId).fadeOut('fast',
+                            function(){});
+
+                    } else {
+                        alert(response.errorMessage);
+                    }
+
+                }
+            });
+        });
+
+
     });
 </script>

@@ -84,24 +84,24 @@ class CheckListAjaxController extends AbstractActionController
                         }
                     }
 
-
                     $checkListItem->setItemContent($item);
                     $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
 
 
                     $row = '<tr id="item-' . $checkListItem->getId() . '">';
-                    $row .= '<td><input class="delete-item" type="checkbox" name="checked-items[]" value="377" /></td>';
-                    foreach ($checkListItem->getItemContent() AS $ontentItem) {
-                        $row .= '<td>' . $ontentItem . '</td>';
+                    $row .= '<td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]" value="377" /></td>';
+                    foreach ($checkListItem->getItemContent() AS $index => $ontentItem) {
+                        $row .= '<td id="' . $checkListItem->getId() . '_'.$index.'">' . $ontentItem . '</td>';
                     }
                     $row .= '<td class="text-center">';
-                    $row .= '<a class="btn btn-sm btn-primary" href="/beheer/checklistitem/edit/' . $checkListItem->getId() . '">';
-                    $row .= '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit';
-                    $row .= '</a>';
-                    $row .= '&nbsp;';
-                    $row .= '<a class="btn btn-sm btn-primary" href="/beheer/checklistitem/delete/' . $checkListItem->getId() . '">';
-                    $row .= '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Verwijder';
-                    $row .= '</a>';
+                    $row .= '<button data-checklistitemid="' . $checkListItem->getId() . '" class="btn btn-sm btn-secondary editChecklistItemOpen">';
+                    $row .= '<i class="fas fa-edit"></i>';
+                    $row .= '</button>&nbsp;';
+                    $row .= '<button data-checklistitemid="' . $checkListItem->getId() . '" class="btn btn-sm btn-danger removeChecklistItemOpen">';
+                    $row .= '<i class="fas fa-trash-alt"></i>';
+                    $row .= '</button>';
+
+
                     $row .= '</td>';
                     $row .= '</tr>';
 
@@ -134,10 +134,22 @@ class CheckListAjaxController extends AbstractActionController
             $success = false;
             $errorMessage = 'ChecklistItem not found';
         }
+
+        $checkList = $checkListItem->getChecklist();
+        $checkListFields = $checkList->getCheckListFields();
+
+        $itemContent = $checkListItem->getItemContent();
+
+        $returnArray = [];
+        foreach ($checkListFields AS $checkListField) {
+            $returnArray[$checkListField->getFormFieldName()]['fieldType'] = $checkListField->getChecklistFieldType()->getFormType();
+            $returnArray[$checkListField->getFormFieldName()]['fieldvalue'] = $itemContent[$checkListField->getFormFieldName()];
+        }
+
         return new JsonModel([
             'success' => $success,
             'errorMessage' => $errorMessage,
-            'itemContent' => $checkListItem->getItemContent(),
+            'itemContent' => $returnArray,
             'checkListItemId' => $checkListItem->getId()
         ]);
 
@@ -150,6 +162,7 @@ class CheckListAjaxController extends AbstractActionController
         $id = $this->params()->fromPost('id', 0);
         $formData = $this->params()->fromPost('formData', 0);
         $formDataArray = explode('&', $formData);
+
         if (empty($id)) {
             $success = false;
             $errorMessage = 'No id given';
@@ -160,7 +173,6 @@ class CheckListAjaxController extends AbstractActionController
             $errorMessage = 'Checklist not found';
         }
 
-        $checkListItem = $this->checkListItemService->createCheckListItem();
         $data = [];
         foreach ($formDataArray AS $formField) {
             $data[] = explode('=', $formField);
@@ -169,17 +181,32 @@ class CheckListAjaxController extends AbstractActionController
 
         $item = [];
         foreach ($data AS $value) {
+
+            if ($value[0] == 'id') {
+                $id = $value[1];
+            }
+
             $item[$value[0]] = urldecode($value[1]);
         }
 
-        $checkListItem->setItemContent($item);
-        $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
+        if (empty($id)) {
+            $checkListItem = $this->checkListItemService->createCheckListItem();
+            $checkListItem->setItemContent($item);
+            $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
+            $action = 'add';
+        } else {
+            $checkListItem = $this->checkListItemService->getCheckListItemById($id);
+            $checkListItem->setItemContent($item);
+            $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
+            $action = 'update';
+        }
 
         return new JsonModel([
             'success' => $success,
             'errorMessage' => $errorMessage,
             'item' => $item,
-            'checkListItemId' => $checkListItem->getId()
+            'checkListItemId' => $checkListItem->getId(),
+            'action' => $action
         ]);
     }
 
@@ -215,6 +242,27 @@ class CheckListAjaxController extends AbstractActionController
             'error_message' => $error_message,
             'deletedItems' => $deletedItems,
             'notDeletedItems' => $notDeletedItems
+        ]);
+    }
+
+    public function deleteItemAction()
+    {
+        $success = true;
+        $errorMessage = '';
+        $checklistItemId = $this->params()->fromPost('id', 0);
+
+        $result = $this->checkListItemService->deleteCheckListItem($checklistItemId);
+        if (!$result) {
+            $success = false;
+            $errorMessage = 'Item niet verwijderd!';
+        } else {
+            $errorMessage = 'Item verwijderd!';
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'errorMessage' => $errorMessage,
+            'checklistItemId' => $checklistItemId
         ]);
     }
 

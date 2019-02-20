@@ -79,6 +79,26 @@ class checkListItemService implements checkListItemServiceInterface {
 
     /**
      *
+     * Set data to new checklistitem
+     *
+     * @param       checklistitem $checklistitem object
+     * @param       checklist $checklist object
+     * @param       currentUser $currentUser whos is logged on
+     * @return      void
+     *
+     */
+    public function updateCheckListItem($checklistitem, $checklist, $currentUser) {
+        $checklistitem->setDateChanged(new \DateTime());
+        $checklistitem->setChangedBy($currentUser);
+        $checklistitem->setChecklist($checklist);
+
+        $this->storeCheckListItem($checklistitem);
+
+        return $checklistitem;
+    }
+
+    /**
+     *
      * Save checklistitem to database
      *
      * @param       checklistitem object
