@@ -34,6 +34,17 @@ class CheckListItem extends UnityOfWork {
      */
     private $checklist;
 
+    /**
+     * One checklistItem has many answerGiven. This is the inverse side.
+     * @ORM\OneToMany(targetEntity="AnswerGiven", mappedBy="checklistItem", cascade={"persist", "remove"})
+     */
+    private $answersGiven;
+
+
+    public function __construct() {
+        $this->answersGiven = new ArrayCollection();
+    }
+
     function getId() {
         return $this->id;
     }
@@ -57,5 +68,29 @@ class CheckListItem extends UnityOfWork {
     function setChecklist($checklist) {
         $this->checklist = $checklist;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAnswersGiven()
+    {
+
+        $answersGiven = [];
+        foreach ($this->answersGiven AS $answerGiven) {
+            $answersGiven[$answerGiven->getChecklistItem()->getId()] = $answerGiven->getAnswer();
+        }
+
+        return $answersGiven;
+    }
+
+    /**
+     * @param mixed $answersGiven
+     */
+    public function setAnswersGiven($answersGiven)
+    {
+        $this->answersGiven = $answersGiven;
+    }
+
+
 
 }

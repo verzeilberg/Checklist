@@ -22,6 +22,9 @@ $form->setAttributes(array(
         <?= $this->pageBreadcrumbs()->render(); ?>
     </div>
 </div>
+<?php
+echo $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist]);
+?>
 <!-- Page Header -->
 <div class="row">
     <h1 class="col">CHECKLIST FIELDS</h1>
@@ -58,11 +61,14 @@ $form->setAttributes(array(
     <div class="col">
         <div class="form-group">
             <?php echo $this->formLabel($form->get('checklistFieldType')); ?>
-            <?php echo $this->formSelect($form->get('checklistFieldType')); ?>
+            <?php echo $this->formSelect($form->get('checklistFieldType')->setAttributes(['disabled' => 'disabled'])); ?>
             <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
         </div>
     </div>
 </div>
+<?php
+echo $this->partial('partial/answers.phtml', ['answers' => $answers, 'checkListField' => $checkListField]);
+?>
 <div class="row">
     <div class="col">
         <button type="submit" id="submit" class="btn btn-dark">Opslaan</button>
@@ -73,8 +79,58 @@ $form->setAttributes(array(
 </div>
 <?php echo $this->form()->closeTag($form); ?>
 
+<?php
+echo $this->partial('partial/answers-library.phtml', ['answers' => $answers, 'formAnswer' => $formAnswer, 'searchLinks' => $searchLinks]);
+?>
+
 <script>
-    $("#fieldType").change(function () {
-        var selectedValue = $(this).val();
+    $(document).ready(function () {
+        $('div#answers').hide();
+        var selectedValue = $("select[name=checklistFieldType]").val();
+        showAnswers(selectedValue);
+
+        $("select[name=checklistFieldType]").change(function () {
+            var selectedValue = $(this).val();
+            showAnswers(selectedValue);
+
+        });
+
+        function showAnswers(selectedValue) {
+            if (selectedValue == 3) {
+                $('#answers').show();
+            } else {
+                $('#answers').hide();
+            }
+        }
+
+        $(function () {
+            $("tbody#sortable").sortable({
+                stop: function (event, ui) {
+                    var fieldId;
+                    var fields = [];
+                    $("tbody#sortable tr").each(function (index) {
+;
+                        $(this).children('td.index').text(index + 1);
+                        fieldId = $(this).data('fieldid');
+                        fields.push(fieldId);
+                    });
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            fields: fields,
+                        },
+                        url: "<?php echo $this->url('checklistajax', ['action' => 'orderCheckListFields']); ?>",
+                        async: true,
+                        success: function (data) {
+                            if (data.success === true) {
+                            } else {
+                                alert('fout');
+                            }
+
+                        }
+                    });
+                }
+            });
+        });
     });
 </script>

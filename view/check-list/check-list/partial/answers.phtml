@@ -1,0 +1,38 @@
+<div class="row mb-5" id="answers">
+    <div class="col">
+        <div class="card">
+            <div class="card-header row">
+                <h5 class="card-title text-dark col mb-0">Antwoorden</h5>
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-dark btn-sm text-white" data-toggle="modal"
+                            data-target="#answerLibrary"><i class="fas fa-book"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="answersTable" class="table table-dark table-sm table-bordered table-hover table-striped">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>Label</th>
+                        <th>Value</th>
+                        <th class="text-center"><i class="fas fa-cogs"></i></th>
+                    </tr>
+                    </thead>
+                    <tbody id="result">
+                    <?php if (is_object($checkListField) && count($checkListField->getAnswers()) > 0) { ?>
+                        <?php foreach ($checkListField->getAnswers() AS $answer) { ?>
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="answers[]" value="<?= $answer->getId() ?>" />
+                                    <?= $answer->getLabel(); ?>
+                                </td>
+                                <td><?= $answer->getValue() ?></td>
+                                <td class="text-center"><button type="button" class="btn btn-sm btn-danger removeAnswer"><i class="fas fa-trash-alt"></i></button></td>
+                            </tr>
+                        <?php } ?>
+                    <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

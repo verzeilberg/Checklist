@@ -1,0 +1,257 @@
+<!-- Modal answer library -->
+<div class="modal fade" id="answerLibrary" tabindex="-1" role="dialog" aria-labelledby="answerLibrary"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="answerLibraryTitle text-white">Vragen bibliotheek</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <form>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="searchAnswerLibrary">Zoeken&hellip;</label>
+                                        <div class="input-group">
+                                            <input type="text" name="search" class="form-control" value=""
+                                                   placeholder="Zoeken..."/>
+                                            <div class="input-group-append">
+                                                <button type="button" id="searchAnswerLibrary"
+                                                        class=" btn input-group-text"><i
+                                                            class="fas fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col">
+                        <?php echo $this->form()->openTag($formAnswer); ?>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Voeg antwoord toe</label>
+                                    <?php echo $this->formText($formAnswer->get('label')); ?>
+                                    <?php echo $this->formElementErrors($formAnswer->get('label')); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <?php echo $this->formText($formAnswer->get('value')); ?>
+                                    <?php echo $this->formElementErrors($formAnswer->get('value')); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="addAnswerButton">Add answer</button>
+                        <?php echo $this->form()->closeTag($formAnswer); ?>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-auto pt-5">
+                        <?php foreach ($searchLinks AS $link) { ?>
+                            <span class="text-secondary searchOnIndex" data-index="<?= $link ?>"><?= $link ?></span>
+                            <br/>
+                        <?php } ?>
+                    </div>
+                    <div class="col">
+                        <table id="answerLibraryTable"
+                               class="table table-dark table-sm table-bordered table-hover table-striped">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th class="text-center"><i class="fas fa-cog"></i></th>
+                                <th>Label</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody id="resultAnswerLibraryTable">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        //Click function to add answer
+        $('#addAnswerButton').on('click', function () {
+            var label = $('input[name=label]').val();
+            var value = $('input[name=value]').val();
+
+            //Ajax call to add or edit checklist item. Based on given id.
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'checkIfAnswerExcist']); ?>',
+                dataType: 'json',
+                data: {
+                    label: label
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.success == true) {
+                        //Check if answer excists
+                        if (response.answerExcists == true) {
+                            $('#answerLibrary').modal('toggle');
+                            bootbox.alert({
+                                message: 'Antwoord bestaat al!',
+                                size: 'large',
+                                className: 'text-dark text-center',
+                                buttons: {
+                                    ok: {
+                                        label: 'Oke',
+                                        className: 'btn-dark'
+                                    }
+                                },
+                                callback: function () {
+                                    $('#answerLibrary').modal('toggle');
+                                }
+                            });
+                        } else {
+                            //Answer does not excist so add it
+                            addAnswer(label, value);
+                        }
+                    } else {
+                        alert(response.errorMessage);
+                    }
+                }
+            });
+        });
+
+
+        //Function to add answer to answer library
+        function addAnswer(label, value) {
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'addAnswer']); ?>',
+                dataType: 'json',
+                data: {
+                    label: label,
+                    value: value
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.success == true) {
+                        var row = $('<tr>');
+                        row.append($('<td>').html(response.data.label));
+                        row.append($('<td>').html(response.data.value));
+                        $('#answerLibraryTable > tbody#result').append(row);
+                    } else {
+                        alert(response.errorMessage);
+                    }
+                }
+            });
+        }
+
+        //Function to search for answers in library
+        $('#searchAnswerLibrary').on('click', function (e) {
+            e.preventDefault();
+            var searchPhrase = $('input[name=search]').val();
+
+            if (searchPhrase) {
+                searchAnswer(searchPhrase);
+            } else {
+                console.log('geen zoekwoord ingevuld');
+            }
+        });
+
+        //Function to search and return result
+        function searchAnswer(searchPhrase) {
+            $('#answerLibraryTable > tbody#resultAnswerLibraryTable').empty();
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'searchAnswer']); ?>',
+                dataType: 'json',
+                data: {
+                    searchPhrase: searchPhrase,
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.success == true) {
+                        $.each(response.result, function (index, object) {
+                            var row = $('<tr>');
+                            row.append($('<td class="text-center">').html('<button data-answerid="' + object.id + '" class="btn btn-sm btn-success addAnswerToQuestion"><i class="fas fa-link"></i></button>'))
+                            row.append($('<td>').html(object.label));
+                            row.append($('<td>').html(object.value));
+                            $('#answerLibraryTable > tbody#resultAnswerLibraryTable').append(row);
+                        });
+
+                    } else {
+                        alert(response.errorMessage);
+                    }
+                }
+            });
+        }
+
+        //Add answer to question
+        $(document).on('click', '.addAnswerToQuestion', function () {
+            var answerId = $(this).data('answerid');
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'addAnswerToQuestion']); ?>',
+                dataType: 'json',
+                data: {
+                    answerId: answerId,
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.success == true) {
+                        var row = $('<tr>');
+                        row.append($('<td>').html('<input type="hidden" name="answers[]" value="' + response.data.id + '" />' + response.data.label));
+                        row.append($('<td>').html(response.data.value));
+                        row.append($('<td class="text-center">').html('<button type="button" class="btn btn-sm btn-danger removeAnswer"><i class="fas fa-trash-alt"></i></button>'));
+                        $('#answersTable > tbody#result').append(row);
+
+                    } else {
+                        alert(response.errorMessage);
+                    }
+                }
+            });
+        });
+    });
+
+
+    //Function to delete answer from question
+    $(document).on('click', '.removeAnswer', function () {
+        $(this).parent('td').parent('tr').remove();
+    });
+
+    //Function to search for answers on index in library
+    $('.searchOnIndex').on('click', function () {
+        $('#answerLibraryTable > tbody#resultAnswerLibraryTable').empty();
+        var index = $(this).data('index');
+        $.ajax({
+            url: '<?php echo $this->url('checklistajax', ['action' => 'searchAnswerOnIndex']); ?>',
+            dataType: 'json',
+            data: {
+                index: index
+            },
+            async: true,
+            type: 'post',
+            success: function (response) {
+                if (response.success == true) {
+                    $.each(response.result, function (index, object) {
+                        var row = $('<tr>');
+                        row.append($('<td class="text-center">').html('<button data-answerid="' + object.id + '" class="btn btn-sm btn-success addAnswerToQuestion"><i class="fas fa-link"></i></button>'))
+                        row.append($('<td>').html(object.label));
+                        row.append($('<td>').html(object.value));
+                        $('#answerLibraryTable > tbody#resultAnswerLibraryTable').append(row);
+                    });
+
+                } else {
+                    alert(response.errorMessage);
+                }
+            }
+        });
+    });
+
+</script>

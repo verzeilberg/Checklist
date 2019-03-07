@@ -22,46 +22,9 @@ $form->setAttributes(array(
         <?= $this->pageBreadcrumbs()->render(); ?>
     </div>
 </div>
-<!-- Second Page Header -->
-<div class="row">
-    <h1 class="col">FIELDS</h1>
-</div>
-<div class="row">
-    <div class="col">
-        <table class="table table-dark table-sm table-bordered table-hover table-striped">
-            <thead class="thead-dark">
-            <tr>
-                <th>Volgorde</th>
-                <th>Naam</th>
-                <th>Type</th>
-                <th class="text-center"><i class="fas fa-cogs"></i></th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($checklist->getCheckListFields() AS $field) { ?>
-                <tr>
-                    <td><?php echo $field->getOrder(); ?></td>
-                    <td><?php echo $field->getName(); ?></td>
-                    <td><?php echo $field->getChecklistFieldType()->getName(); ?></td>
-                    <td class="text-center">
-                        <a class="btn btn-sm btn-secondary" href="
-                   <?= $this->url('beheer/checklist', ['action' => 'edit-field', 'id' => $field->getId()]); ?>">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        &nbsp;
-                        <a class="btn btn-sm btn-danger" href="
-                   <?= $this->url('beheer/checklist', ['action' => 'delete-field', 'id' => $field->getId()]); ?>">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </td>
-                </tr>
-            <?php } ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
+<?php
+echo $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist]);
+?>
 <!-- THIRD Page Header -->
 <div class="row">
     <h1 class="col">CHECKLIST FIELDS</h1>
@@ -103,6 +66,10 @@ $form->setAttributes(array(
         </div>
     </div>
 </div>
+<?php
+echo $this->partial('partial/answers.phtml', ['answers' => $answers]);
+?>
+
 
 <div class="row">
     <div class="col">
@@ -112,12 +79,64 @@ $form->setAttributes(array(
         <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-dark" title="Annuleren">Annuleren</a>
     </div>
 </div>
+
 <?php echo $this->form()->closeTag($form); ?>
 
+
+<?php
+echo $this->partial('partial/answers-library.phtml', ['answers' => $answers, 'formAnswer' => $formAnswer, 'searchLinks' => $searchLinks]);
+?>
+
+
 <script>
-    $("#fieldType").change(function () {
-        var selectedValue = $(this).val();
+    $(document).ready(function () {
+        $('div#answers').hide();
+        var selectedValue = $("select[name=checklistFieldType]").val();
+        showAnswers(selectedValue);
 
+        console.log(selectedValue);
+        $("select[name=checklistFieldType]").change(function () {
+            var selectedValue = $(this).val();
+            showAnswers(selectedValue);
 
+        });
+
+        function showAnswers(selectedValue) {
+            if (selectedValue == 3) {
+                $('#answers').show();
+            } else {
+                $('#answers').hide();
+            }
+        }
+
+        $(function () {
+            $("tbody#sortable").sortable({
+                stop: function (event, ui) {
+                    var fieldId;
+                    var fields = [];
+                    $("tbody#sortable tr").each(function (index) {
+                        ;
+                        $(this).children('td.index').text(index + 1);
+                        fieldId = $(this).data('fieldid');
+                        fields.push(fieldId);
+                    });
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            fields: fields,
+                        },
+                        url: "<?php echo $this->url('checklistajax', ['action' => 'orderCheckListFields']); ?>",
+                        async: true,
+                        success: function (data) {
+                            if (data.success === true) {
+                            } else {
+                                alert('fout');
+                            }
+
+                        }
+                    });
+                }
+            });
+        });
     });
 </script>

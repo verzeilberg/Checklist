@@ -57,23 +57,18 @@ $this->pageBreadcrumbs()->setItems([
             </tr>
             </thead>
             <tbody id="result">
+
+
             <?php if (count($checklist->getCheckListItems()) > 0) { ?>
                 <?php foreach ($checklist->getCheckListItems() AS $item) { ?>
+                    <?php $answers = $item->getAnswersGiven(); ?>
                     <tr id="item-<?php echo $item->getId(); ?>">
                         <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]"
                                                        value="<?php echo $item->getId(); ?>"/></td>
                         <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
-                            <td id="<?= $item->getId() . '_' . $fields->getFormFieldName(); ?>" <?php echo($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
+                            <td id="<?= $item->getId() . '_' . $fields->getId(); ?>" <?php echo($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
                                 <?php
-                                if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
-                                    if ($item->getItemContent()[$fields->getFormFieldName()] == 1) {
-                                        echo '<i class="fas fa-check-square"></i>';
-                                    } else {
-                                        echo '<i class="far fa-square"></i>';
-                                    }
-                                } else {
-                                    echo $item->getItemContent()[$fields->getFormFieldName()];
-                                }
+                                    echo $answers[$item->getId()];
                                 ?>
                             </td>
                         <?php } ?>
@@ -112,11 +107,11 @@ echo $this->partial('check-list/partial/export-file.phtml', array('checklist' =>
 ?>
 <!-- End Export file -->
 
-<!-- Export file -->
+<!-- Add checklist item-->
 <?php
 echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
 ?>
-<!-- End Export file -->
+<!-- End checklist item -->
 
 
 <script>

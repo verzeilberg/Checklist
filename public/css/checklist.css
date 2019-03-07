@@ -1,0 +1,9 @@
+.searchOnIndex {
+    cursor: pointer;
+}
+
+#sortablev, #checkListFieldHeader {
+    list-style: none;
+    margin:0;
+    padding:0;
+}

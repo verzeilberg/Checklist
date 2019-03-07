@@ -62,9 +62,16 @@ class CheckList extends UnityOfWork {
      */
     private $checkListFields;
 
+    /**
+     * One checklist has many answerGiven. This is the inverse side.
+     * @ORM\OneToMany(targetEntity="AnswerGiven", mappedBy="checklist")
+     */
+    private $answersGiven;
+
     public function __construct() {
         $this->checkListItems = new ArrayCollection();
         $this->checkListFields = new ArrayCollection();
+        $this->answersGiven = new ArrayCollection();
     }
 
     function getId() {
@@ -138,5 +145,22 @@ class CheckList extends UnityOfWork {
     function setPublic($public) {
         $this->public = $public;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAnswersGiven()
+    {
+        return $this->answersGiven;
+    }
+
+    /**
+     * @param mixed $answersGiven
+     */
+    public function setAnswersGiven($answersGiven)
+    {
+        $this->answersGiven = $answersGiven;
+    }
+
 
 }

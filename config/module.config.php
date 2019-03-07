@@ -2,6 +2,7 @@
 
 namespace CheckList;
 
+use CheckList\Entity\CheckList;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -51,6 +52,8 @@ return [
         'invokables' => [
             CheckList\checkListServiceInterface::class => Service\checkListService::class,
             CheckList\checkListFieldServiceInterface::class => Service\checkListFieldService::class,
+            CheckList\checkListAnswerServiceInterface::class => Service\checkListAnswerService::class,
+            CheckList\givenAnswerServiceInterface::class => Service\givenAnswerService::class,
         ],
     ],
     'doctrine' => [
@@ -84,5 +87,12 @@ return [
                 ['actions' => '*', 'allow' => '+checklist.manage']
             ],
         ]
+    ],
+    'asset_manager' => [
+        'resolver_configs' => [
+            'paths' => [
+                __DIR__ . '/../public',
+            ],
+        ],
     ],
 ];

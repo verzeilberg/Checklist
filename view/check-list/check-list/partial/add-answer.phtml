@@ -1,0 +1,122 @@
+<!-- Modal to add answer -->
+<div class="modal fade" id="addAnswer" tabindex="-1" role="dialog" aria-labelledby="addAnswerTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAnswerTitle">Modal title</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <?php echo $this->form()->openTag($formAnswer); ?>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <?php echo $this->formLabel($formAnswer->get('label')); ?>
+                            <?php echo $this->formText($formAnswer->get('label')); ?>
+                            <?php echo $this->formElementErrors($formAnswer->get('label')); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <?php echo $this->formLabel($formAnswer->get('value')); ?>
+                            <?php echo $this->formText($formAnswer->get('value')); ?>
+                            <?php echo $this->formElementErrors($formAnswer->get('value')); ?>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" id="addAnswerButton">Add answer</button>
+            </div>
+            <?php echo $this->form()->closeTag($formAnswer); ?>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        //Click function to add answer
+        $('#addAnswerButton').on('click', function () {
+            var label = $('input[name=label]').val();
+            var value = $('input[name=value]').val();
+
+            //Ajax call to add or edit checklist item. Based on given id.
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'checkIfAnswerExcist']); ?>',
+                dataType: 'json',
+                data: {
+                    label: label
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.success == true) {
+                        //Check if answer excists
+                        if (response.answerExcists == true) {
+                            $('#addAnswer').modal('toggle');
+                            bootbox.alert({
+                                message: 'Antwoord bestaat al!',
+                                size: 'large',
+                                className: 'text-dark text-center',
+                                buttons: {
+                                    ok: {
+                                        label: 'Oke',
+                                        className: 'btn-dark'
+                                    }
+                                },
+                                callback: function () {
+                                    $('#addAnswer').modal('toggle');
+                                }
+                            });
+                        } else {
+                            //Answer does not excist so add it
+                            addAnswer(label, value);
+                        }
+                    } else {
+                        alert(response.errorMessage);
+                    }
+                }
+            });
+        });
+
+
+        //Function to add answer to answer library
+        function addAnswer(label, value) {
+            $.ajax({
+                url: '<?php echo $this->url('checklistajax', ['action' => 'addAnswer']); ?>',
+                dataType: 'json',
+                data: {
+                    label: label,
+                    value: value
+                },
+                async: true,
+                type: 'post',
+                success: function (response) {
+                    if (response.success == true) {
+
+                        var row = $('<tr id="item-' + response.checkListItemId + '">');
+                        row.append($('<td class="text-center">').html('<input type="checkbox" name="answers[]"\n' +
+                            '                                                           value="' + response.data.id + '"/>'));
+                        row.append($('<td>').html(response.data.label));
+                        row.append($('<td>').html(response.data.value));
+                        $('#answersTable > tbody#result').append(row);
+
+                        $(function () {
+                            $('#addAnswer').modal('toggle');
+                        });
+                    } else {
+                        alert(response.errorMessage);
+                    }
+                }
+            });
+        }
+
+
+    });
+</script>

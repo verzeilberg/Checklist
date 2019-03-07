@@ -6,4 +6,4 @@ if(is_object($checklistitem))
     $value = $values[$checkListField->getFormFieldName()];
 }
 ?>
-<textarea class="form-control" <?php echo ($checkListField->getRequired() == 1? 'required':'') ?> name="<?php echo $checkListField->getFormFieldName(); ?>"><?php echo $value; ?></textarea><br/>
+<textarea class="form-control" <?php echo ($checkListField->getRequired() == 1? 'required':'') ?> name="<?= $checkListField->getId(); ?>"><?php echo $value; ?></textarea><br/>

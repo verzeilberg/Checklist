@@ -1,11 +1,15 @@
 <?php
 namespace CheckList\Controller\Factory;
 
+use CheckList\Service\checkListFieldService;
+use CheckList\Service\givenAnswerService;
 use Interop\Container\ContainerInterface;
 use CheckList\Controller\CheckListAjaxController;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use CheckList\Service\checkListService;
 use CheckList\Service\checkListItemService;
+use CheckList\Service\checkListAnswerService;
+
 /**
  * This is the factory for AuthController. Its purpose is to instantiate the controller
  * and inject dependencies into its constructor.
@@ -17,6 +21,17 @@ class CheckListAjaxControllerFactory implements FactoryInterface
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $checkListService = new checkListService($entityManager);
         $checkListItemService = new checkListItemService($entityManager);
-        return new CheckListAjaxController($entityManager, $checkListService, $checkListItemService);
+        $checkListAnswerService = new checkListAnswerService($entityManager);
+        $checkListFieldService = new checkListFieldService($entityManager);
+        $givenAnswerService = new givenAnswerService($entityManager, $checkListFieldService);
+
+        return new CheckListAjaxController(
+            $entityManager,
+            $checkListService,
+            $checkListItemService,
+            $checkListAnswerService,
+            $checkListFieldService,
+            $givenAnswerService
+        );
     }
 }

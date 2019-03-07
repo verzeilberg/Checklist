@@ -19,15 +19,28 @@ class CheckListAjaxController extends AbstractActionController
     private $entityManager;
     private $checkListService;
     private $checkListItemService;
+    private $checkListAnswerService;
+    private $checkListFieldService;
+    private $givenAnswerService;
 
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $checkListService, $checkListItemService)
+    public function __construct(
+        $entityManager,
+        $checkListService,
+        $checkListItemService,
+        $checkListAnswerService,
+        $checkListFieldService,
+        $givenAnswerService
+    )
     {
         $this->entityManager = $entityManager;
         $this->checkListService = $checkListService;
         $this->checkListItemService = $checkListItemService;
+        $this->checkListAnswerService = $checkListAnswerService;
+        $this->checkListFieldService = $checkListFieldService;
+        $this->givenAnswerService = $givenAnswerService;
     }
 
     /**
@@ -91,7 +104,7 @@ class CheckListAjaxController extends AbstractActionController
                     $row = '<tr id="item-' . $checkListItem->getId() . '">';
                     $row .= '<td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]" value="377" /></td>';
                     foreach ($checkListItem->getItemContent() AS $index => $ontentItem) {
-                        $row .= '<td id="' . $checkListItem->getId() . '_'.$index.'">' . $ontentItem . '</td>';
+                        $row .= '<td id="' . $checkListItem->getId() . '_' . $index . '">' . $ontentItem . '</td>';
                     }
                     $row .= '<td class="text-center">';
                     $row .= '<button data-checklistitemid="' . $checkListItem->getId() . '" class="btn btn-sm btn-secondary editChecklistItemOpen">';
@@ -179,26 +192,27 @@ class CheckListAjaxController extends AbstractActionController
 
         }
 
-        $item = [];
-        foreach ($data AS $value) {
 
+        $checklistItemId = array_shift($data)[1];
+
+
+        if (empty($checklistItemId)) {
+            $checkListItem = $this->checkListItemService->createCheckListItem();
+            $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
+            $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
+            $action = 'add';
+        } else {
+            $checkListItem = $this->checkListItemService->getCheckListItemById($checklistItemId);
+            $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
+            $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
+            $action = 'update';
+        }
+
+        foreach ($data AS $value) {
             if ($value[0] == 'id') {
                 $id = $value[1];
             }
-
             $item[$value[0]] = urldecode($value[1]);
-        }
-
-        if (empty($id)) {
-            $checkListItem = $this->checkListItemService->createCheckListItem();
-            $checkListItem->setItemContent($item);
-            $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
-            $action = 'add';
-        } else {
-            $checkListItem = $this->checkListItemService->getCheckListItemById($id);
-            $checkListItem->setItemContent($item);
-            $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
-            $action = 'update';
         }
 
         return new JsonModel([
@@ -210,11 +224,6 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    /**
-     * Index action to show checklistst
-     *
-     * @return Array()
-     */
     public function deleteItemsAction()
     {
         $error = false;
@@ -264,6 +273,163 @@ class CheckListAjaxController extends AbstractActionController
             'errorMessage' => $errorMessage,
             'checklistItemId' => $checklistItemId
         ]);
+    }
+
+
+    public function addAnswerAction()
+    {
+        $success = true;
+        $errorMessage = '';
+        $data = [];
+        $label = trim($this->params()->fromPost('label', ''));
+        $value = trim($this->params()->fromPost('value', ''));
+
+        if (!empty($label) || !empty($value)) {
+
+            //Check if answer already excists
+            if (!is_object($this->checkListAnswerService->getAnswerByLabel($label))) {
+                $answer = $this->checkListAnswerService->createAnswer();
+                $answer->setLabel($label);
+                $answer->setValue($value);
+                $this->checkListAnswerService->setNewAnswer($answer, $this->currentUser());
+                //Set data in array
+                $data['id'] = $answer->getId();
+                $data['label'] = $answer->getLabel();
+                $data['value'] = $answer->getValue();
+
+            } else {
+                $errorMessage = 'Bestaat al een vraag met dat label!';
+                $success = false;
+            }
+
+        } else {
+            $errorMessage = 'Geen label of waarde ingevuld!';
+            $success = false;
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'errorMessage' => $errorMessage,
+            'data' => $data
+        ]);
+    }
+
+    public function checkIfAnswerExcistAction()
+    {
+        $success = true;
+        $answerExcists = false;
+        $errorMessage = '';
+        $label = trim($this->params()->fromPost('label', ''));
+        if (!empty($label)) {
+
+            //Check if answer already excists
+            if ($this->checkListAnswerService->getAnswerByLabel($label)) {
+                $answerExcists = true;
+            }
+
+        } else {
+            $errorMessage = 'Geen label of waarde ingevuld!';
+            $success = false;
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'answerExcists' => $answerExcists,
+            'errorMessage' => $errorMessage,
+        ]);
+    }
+
+    public function searchAnswerAction()
+    {
+        $success = true;
+        $errorMessage = '';
+        $searchPhrase = trim($this->params()->fromPost('searchPhrase', ''));
+        if (!empty($searchPhrase)) {
+
+            //Check if answer already excists
+            $result = $this->checkListAnswerService->getAnswersByLabel($searchPhrase);
+
+        } else {
+            $errorMessage = 'Geen label of waarde ingevuld!';
+            $success = false;
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'result' => $result,
+            'errorMessage' => $errorMessage,
+        ]);
+    }
+
+    public function searchAnswerOnIndexAction()
+    {
+        $success = true;
+        $errorMessage = '';
+        $index = trim($this->params()->fromPost('index', ''));
+        if (!empty($index)) {
+
+            if (is_numeric($index[0])) {
+                $result = $this->checkListAnswerService->getAnswersByIntegerIndex();
+            } else {
+                //Check if answer already excists
+                $result = $this->checkListAnswerService->getAnswersByIndex($index);
+            }
+        } else {
+            $errorMessage = 'Geen label of waarde ingevuld!';
+            $success = false;
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'result' => $result,
+            'errorMessage' => $errorMessage,
+        ]);
+    }
+
+    public function addAnswerToQuestionAction()
+    {
+        $success = true;
+        $errorMessage = '';
+        $answerId = $this->params()->fromPost('answerId', 0);
+
+        $answer = $this->checkListAnswerService->getAnswerById($answerId);
+        if (empty($answer)) {
+            $success = false;
+            $errorMessage = 'Antwoord niet gevonden!';
+        } else {
+            //Set data in array
+            $data['id'] = $answer->getId();
+            $data['label'] = $answer->getLabel();
+            $data['value'] = $answer->getValue();
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'errorMessage' => $errorMessage,
+            'data' => $data
+        ]);
+    }
+
+    public function orderCheckListFieldsAction()
+    {
+        $success = true;
+        $errorMessage = '';
+        $checkListFields = $this->params()->fromPost('fields', '');
+
+        foreach($checkListFields AS $index => $checkListFieldId) {
+
+           $sortOrder = $index + 1;
+
+            $checkListField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId);
+            $checkListField->setOrder($sortOrder);
+            $this->checkListFieldService->storeCheckListField($checkListField);
+        }
+
+        return new JsonModel([
+            'success' => $success,
+            'errorMessage' => $errorMessage
+        ]);
+
     }
 
 }

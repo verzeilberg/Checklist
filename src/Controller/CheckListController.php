@@ -17,21 +17,32 @@ class CheckListController extends AbstractActionController {
      * @var Doctrine\ORM\EntityManager 
      */
     private $entityManager;
+    private $viewhelpermanager;
     private $checkListService;
     private $checkListItemService;
     private $checkListFieldService;
+    private $checkListAnswerService;
+    private $givenAnswerService;
 
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $checkListService, $checkListItemService, $checkListFieldService) {
-
-
-
+    public function __construct(
+        $entityManager,
+        $viewhelpermanager,
+        $checkListService,
+        $checkListItemService,
+        $checkListFieldService,
+        $checkListAnswerService,
+        $givenAnswerService
+    ) {
         $this->entityManager = $entityManager;
+        $this->viewhelpermanager = $viewhelpermanager;
         $this->checkListService = $checkListService;
         $this->checkListItemService = $checkListItemService;
         $this->checkListFieldService = $checkListFieldService;
+        $this->checkListAnswerService = $checkListAnswerService;
+        $this->givenAnswerService = $givenAnswerService;
     }
 
     /**
@@ -190,6 +201,10 @@ class CheckListController extends AbstractActionController {
 
     public function addFieldAction() {
         $this->layout('layout/beheer');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery-ui.min.js');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/checklist.css');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/jquery-ui.min.css');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -202,6 +217,8 @@ class CheckListController extends AbstractActionController {
 
         $checkListField = $this->checkListFieldService->createChecklistField();
         $form = $this->checkListFieldService->createCheckListFieldForm($checkListField);
+        $answer = $this->checkListAnswerService->createAnswer();
+        $formAnswer = $this->checkListAnswerService->createAnswerForm($answer);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->getRequest()->getPost());
@@ -212,18 +229,27 @@ class CheckListController extends AbstractActionController {
                 $this->flashMessenger()->addSuccessMessage('CheckListField opgeslagen');
 
                 return $this->redirect()->toRoute('beheer/checklist', array('action' => 'add-field', 'id' => $checklist->getId()));
-            } else {
-                var_dump($form->getMessages());
             }
         }
+
+        $answers = $this->checkListAnswerService->getAnswers();
+        $searchLinks = $this->checkListAnswerService->getSearchLinks();
+
         return new ViewModel([
             'checklist' => $checklist,
-            'form' => $form
+            'form' => $form,
+            'formAnswer' => $formAnswer,
+            'answers' => $answers,
+            'searchLinks' => $searchLinks
         ]);
     }
 
     public function editFieldAction() {
         $this->layout('layout/beheer');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery-ui.min.js');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/checklist.css');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/jquery-ui.min.css');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -235,6 +261,8 @@ class CheckListController extends AbstractActionController {
         }
         $checkList = $checkListField->getChecklist();
         $form = $this->checkListFieldService->createCheckListFieldForm($checkListField);
+        $answer = $this->checkListAnswerService->createAnswer();
+        $formAnswer = $this->checkListAnswerService->createAnswerForm($answer);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->getRequest()->getPost());
@@ -247,9 +275,17 @@ class CheckListController extends AbstractActionController {
                 return $this->redirect()->toRoute('beheer/checklist', array('action' => 'add-field', 'id' => $checkList->getId()));
             }
         }
+
+        $answers = $this->checkListAnswerService->getAnswers();
+        $searchLinks = $this->checkListAnswerService->getSearchLinks();
+
         return new ViewModel([
             'checklist' => $checkList,
-            'form' => $form
+            'form' => $form,
+            'formAnswer' => $formAnswer,
+            'answers' => $answers,
+            'checkListField' => $checkListField,
+            'searchLinks'=> $searchLinks
         ]);
     }
 

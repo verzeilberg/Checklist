@@ -13,7 +13,8 @@ use Application\Model\UnityOfWork;
  * @ORM\Entity
  * @ORM\Table(name="checklistfields")
  */
-class CheckListField extends UnityOfWork {
+class CheckListField extends UnityOfWork
+{
 
     /**
      * @ORM\Id
@@ -57,7 +58,7 @@ class CheckListField extends UnityOfWork {
      * })
      * @Annotation\Attributes({"class":""})
      */
-    protected $required = 0;
+    protected $required = 999;
 
     /**
      * Many checklistfields have One Checklist.
@@ -82,68 +83,169 @@ class CheckListField extends UnityOfWork {
      */
     private $checklistFieldType;
 
-    function getId() {
+    /**
+     * One checkListField has many answerGiven. This is the inverse side.
+     * @ORM\OneToMany(targetEntity="AnswerGiven", mappedBy="checklistField", cascade={"persist", "remove"})
+     */
+    private $answersGiven;
+
+    /**
+     * Many Users have Many Groups.
+     * @ORM\ManyToMany(targetEntity="Answer")
+     * @Annotation\Type("DoctrineModule\Form\Element\ObjectMultiCheckbox")
+     * @ORM\JoinTable(name="checklistfield_answer",
+     *      joinColumns={@ORM\JoinColumn(name="checklistfield_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="answer_id", referencedColumnName="id")}
+     *      )
+     */
+    private $answers;
+
+    public function __construct()
+    {
+        $this->answers = new ArrayCollection();
+        $this->answersGiven = new ArrayCollection();
+    }
+
+    public function addAnswers($answers)
+    {
+        foreach ($answers as $answer) {
+            $this->answers->add($answer);
+        }
+    }
+
+    public function removeAnswers($answers)
+    {
+        foreach ($answers as $answer) {
+            $this->answers->removeElement($answer);
+        }
+    }
+
+    function getId()
+    {
         return $this->id;
     }
 
-    function getName() {
+    function getName()
+    {
         return $this->name;
     }
 
-    function getChecklist() {
+    function getChecklist()
+    {
         return $this->checklist;
     }
 
-    function setId($id) {
+    function setId($id)
+    {
         $this->id = $id;
     }
 
-    function setName($name) {
+    function setName($name)
+    {
         $this->name = $name;
     }
 
-    function setChecklist($checklist) {
+    function setChecklist($checklist)
+    {
         $this->checklist = $checklist;
     }
 
-    function getOrder() {
+    function getOrder()
+    {
         return $this->order;
     }
 
-    function getChecklistFieldType() {
+    function getChecklistFieldType()
+    {
         return $this->checklistFieldType;
     }
 
-    function setOrder($order) {
+    function setOrder($order)
+    {
         $this->order = $order;
     }
 
-    function setChecklistFieldType($checklistFieldType) {
+    function setChecklistFieldType($checklistFieldType)
+    {
         $this->checklistFieldType = $checklistFieldType;
     }
 
-    function getRequired() {
+    function getRequired()
+    {
         return $this->required;
     }
 
-    function setRequired($required) {
+    function setRequired($required)
+    {
         $this->required = $required;
     }
 
-    function getFormFieldName() {
+    function getFormFieldName()
+    {
         return $this->formFieldName;
     }
 
-    function setFormFieldName($formFieldName) {
+    function setFormFieldName($formFieldName)
+    {
 
         $formFieldName = trim($formFieldName);
         $this->formFieldName = $this->clean($formFieldName);
     }
 
-    private function clean($string) {
+    private function clean($string)
+    {
         $string = strtolower(str_replace(' ', '_', $string)); // Replaces all spaces with hyphens.
 
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAnswers()
+    {
+        return $this->answers;
+    }
+
+    /**
+     * @param mixed $answers
+     */
+    public function setAnswers($answers)
+    {
+        $this->answers = $answers;
+    }
+
+
+    public function checkIfAnswerIsLinked($id)
+    {
+
+        $result = false;
+        foreach ($this->answers as $answer) {
+            if ($answer->getId() == $id) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAnswersGiven()
+    {
+        return $this->answersGiven;
+    }
+
+    /**
+     * @param mixed $answersGiven
+     */
+    public function setAnswersGiven($answersGiven)
+    {
+        $this->answersGiven = $answersGiven;
+    }
+
+
 
 }
