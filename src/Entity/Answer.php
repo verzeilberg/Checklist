@@ -44,6 +44,16 @@ class Answer extends UnityOfWork {
     protected $value;
 
     /**
+     * One answer has many answerGiven. This is the inverse side.
+     * @ORM\OneToMany(targetEntity="AnswerGiven", mappedBy="answerValue")
+     */
+    private $answersGiven;
+
+    public function __construct() {
+        $this->answersGiven = new ArrayCollection();
+    }
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -89,6 +99,22 @@ class Answer extends UnityOfWork {
     public function setValue($value)
     {
         $this->value = $value;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAnswersGiven()
+    {
+        return $this->answersGiven;
+    }
+
+    /**
+     * @param mixed $answersGiven
+     */
+    public function setAnswersGiven($answersGiven)
+    {
+        $this->answersGiven = $answersGiven;
     }
 
 

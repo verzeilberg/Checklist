@@ -125,6 +125,7 @@ class CheckListController extends AbstractActionController {
 
     public function showAction() {
         $this->layout('layout/beheer');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/underscore-1.9.1.js');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -139,11 +140,13 @@ class CheckListController extends AbstractActionController {
 
         $checkListItem = $this->checkListItemService->createCheckListItem();
         $form = $this->checkListItemService->createCheckListItemForm($checkListItem);
+        $givenAnswers = $this->givenAnswerService->getGivenAnswersByChecklistId($checklist->getId());
 
         return new ViewModel([
             'checklist' => $checklist,
             'checkListFields' => $checkListFields,
-            'form' => $form
+            'form' => $form,
+            'givenAnswers' => $givenAnswers
 
         ]);
     }

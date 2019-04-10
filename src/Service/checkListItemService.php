@@ -25,7 +25,6 @@ class checkListItemService implements checkListItemServiceInterface {
     public function getCheckListItemById($id) {
         $checkListItem = $this->em->getRepository(CheckListItem::class)
                 ->findOneBy(['id' => $id], []);
-
         return $checkListItem;
     }
 

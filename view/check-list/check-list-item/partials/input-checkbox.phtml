@@ -12,7 +12,7 @@ if(is_object($checklistitem))
 
 foreach ($checkListField->getAnswers() AS $answer) { ?>
 
-    <br/><input <?= ($checkListField->getRequired() == 1? 'required':'') ?> type="<?=$checkListField->getChecklistFieldType()->getFormType(); ?>" name="<?= $checkListField->getId(); ?>" value="<?= $answer->getValue(); ?>" />&nbsp;<?= $answer->getLabel(); ?>
+    <br/><input <?= ($checkListField->getRequired() == 1? 'required':'') ?> type="<?=$checkListField->getChecklistFieldType()->getFormType(); ?>" name="<?= $checkListField->getId(); ?>" value="<?= $answer->getId(); ?>" />&nbsp;<?= $answer->getLabel(); ?>
 
 <?php
 }

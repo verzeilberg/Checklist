@@ -45,7 +45,7 @@ class CheckListFieldType extends UnityOfWork {
     /**
      * One ChecklistFieldType has Many CheckListFields.
      * @ORM\OneToMany(targetEntity="CheckListField", mappedBy="checklistFieldType")
-     * @ORM\OrderBy({"number" = "ASC"})
+     * @ORM\OrderBy({"order" = "ASC"})
      */
     private $checkListFields;
 

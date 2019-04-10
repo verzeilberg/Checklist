@@ -7,14 +7,18 @@ use CheckList\Entity\AnswerGiven;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 
-class givenAnswerService implements givenAnswerServiceInterface {
+class givenAnswerService implements givenAnswerServiceInterface
+{
 
     protected $em;
     protected $checkListFieldService;
+    protected $checkListAnswerService;
 
-    public function __construct($em, $checkListFieldService) {
+    public function __construct($em, $checkListFieldService, $checkListAnswerService)
+    {
         $this->em = $em;
         $this->checkListFieldService = $checkListFieldService;
+        $this->checkListAnswerService = $checkListAnswerService;
     }
 
 
@@ -26,39 +30,101 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      object
      *
      */
-    public function getGivenAnswerById($id) {
+    public function getGivenAnswerById($id)
+    {
         $answerGiven = $this->em->getRepository(AnswerGiven::class)
-                ->findOneBy(['id' => $id], []);
+            ->findOneBy(['id' => $id], []);
 
         return $answerGiven;
     }
 
-    public function getAnswersByChecklistId($checklistId) {
+    public function getGivenAnswersByChecklistId($checklistId)
+    {
         $qb = $this->em->getRepository(AnswerGiven::class)->createQueryBuilder('ag');
-        $qb->select('ag.id answerGivenId, ag.answer answer, cli.id checkListItemId, clf.id checkListFieldId');
-        $qb->join('ag.checklist', 'c');
-        $qb->join('ag.checklistItem' , 'cli');
-        $qb->join('ag.checklistField', 'clf');
+        $qb->select('ag.id answerGivenId, ag.answer answer, cli.id checkListItemId, clf.id checkListFieldId, a.label answerGiven');
+        $qb->leftJoin('ag.checklist', 'c');
+        $qb->leftJoin('ag.checklistItem', 'cli');
+        $qb->leftJoin('ag.checklistField', 'clf');
+        $qb->leftJoin('ag.answerValue', 'a');
         $qb->where('c.id = ' . $checklistId);
         $query = $qb->getQuery();
-        $array = $query->getArrayResult();
+        $result = $query->getResult();
 
-        return $array;
+
+        $data = [];
+        foreach ($result AS $item) {
+            $givenAnswer = $item["answer"];
+            if ($givenAnswer == null) {
+                $givenAnswer = $item["answerGiven"];
+            }
+
+            $data[$item["checkListItemId"]][$item["checkListFieldId"]][$item["answerGivenId"]] = $givenAnswer;
+        }
+
+        return $data;
+    }
+
+    public function getGivenAnswersByChecklisItemtId($checklistItemId)
+    {
+        $qb = $this->em->getRepository(AnswerGiven::class)->createQueryBuilder('ag');
+        $qb->leftJoin('ag.answerValue', 'av');
+        $qb->leftJoin('ag.checklistItem', 'cli');
+        $qb->leftJoin('ag.checklistField', 'clf');
+        $qb->where('cli.id = ' . $checklistItemId);
+        $query = $qb->getQuery();
+        $result = $query->getResult();
+
+        $data = [];
+        foreach ($result AS $item) {
+
+
+            if (!empty($item->getAnswer())) {
+                $data[$checklistItemId][$item->getChecklistField()->getId()][] = $item->getAnswer();
+            } else {
+                $data[$checklistItemId][$item->getChecklistField()->getId()][] = $item->getAnswerValue()->getId();
+            }
+
+        }
+
+        return $data;
     }
 
 
-    public function saveAnswers($data, $checkListItem, $checklist){
-        foreach ($data AS $value) {
+    public function saveAnswers($data, $checkListItem, $checklist)
+    {
+
+        $answerData = [];
+        foreach ($data AS $index => $value) {
+            $answerGiven = $this->createAnswerGiven();
 
             $checkListFieldId = $value[0];
             $checklistField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId);
-            $answerGiven =  $this->createAnswerGiven();
+            $givenAnswer = null;
+            $formType = $checklistField->getChecklistFieldType()->getFormType();
+            if ($formType == 'checkbox') {
+                $answer = $this->checkListAnswerService->getAnswerById($value[1]);
+                $answerGiven->setAnswerValue($answer);
+                $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
+            } else {
+                $givenAnswer = $value[1];
+                $answerData[$checklistField->getId()]['type'][$formType] = $givenAnswer;
+            }
+
             $answerGiven->setChecklist($checklist);
             $answerGiven->setChecklistItem($checkListItem);
             $answerGiven->setChecklistField($checklistField);
-            $answerGiven->setAnswer($value[1]);
+            $answerGiven->setAnswer($givenAnswer);
             $this->setNewAnswerGiven($answerGiven, null);
 
+        }
+
+        return (array)$answerData;
+
+    }
+
+    public function deleteAnswersGiven($checklistItem = null) {
+        foreach($checklistItem->getAnswersGivenForDeleting() AS $answerGiven) {
+            $this->deleteAnswerGiven($answerGiven);
         }
     }
 
@@ -70,7 +136,8 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      object
      *
      */
-    public function createAnswerGiven() {
+    public function createAnswerGiven()
+    {
         return new AnswerGiven();
     }
 
@@ -83,7 +150,8 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      void
      *
      */
-    public function setNewAnswerGiven($answerGiven, $currentUser) {
+    public function setNewAnswerGiven($answerGiven, $currentUser)
+    {
         $answerGiven->setDateCreated(new \DateTime());
         $answerGiven->setCreatedBy($currentUser);
 
@@ -99,7 +167,8 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      void
      *
      */
-    public function archiveAnswerGiven($answerGiven, $currentUser) {
+    public function archiveAnswerGiven($answerGiven, $currentUser)
+    {
         $answerGiven->setDateDeleted(new \DateTime());
         $answerGiven->setDeleted(1);
         $answerGiven->setDeletedBy($currentUser);
@@ -116,7 +185,8 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      void
      *
      */
-    public function unArchiveAnswerGiven($answerGiven, $currentUser) {
+    public function unArchiveAnswerGiven($answerGiven, $currentUser)
+    {
         $answerGiven->setDeletedBy(NULL);
         $answerGiven->setChangedBy($currentUser);
         $answerGiven->setDeleted(0);
@@ -134,7 +204,8 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      void
      *
      */
-    public function storeAnswerGiven($answerGiven) {
+    public function storeAnswerGiven($answerGiven)
+    {
         $this->em->persist($answerGiven);
         $this->em->flush();
     }
@@ -146,7 +217,8 @@ class givenAnswerService implements givenAnswerServiceInterface {
      * @return      void
      *
      */
-    public function deleteAnswerGiven($answerGiven) {
+    public function deleteAnswerGiven($answerGiven)
+    {
         $this->em->remove($answerGiven);
         $this->em->flush();
     }

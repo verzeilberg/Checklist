@@ -143,7 +143,7 @@ class CheckListAjaxController extends AbstractActionController
             $errorMessage = 'No id given';
         }
         $checkListItem = $this->checkListItemService->getCheckListItemById($id);
-        if (empty($checklist)) {
+        if (empty($checkListItem)) {
             $success = false;
             $errorMessage = 'ChecklistItem not found';
         }
@@ -151,18 +151,13 @@ class CheckListAjaxController extends AbstractActionController
         $checkList = $checkListItem->getChecklist();
         $checkListFields = $checkList->getCheckListFields();
 
-        $itemContent = $checkListItem->getItemContent();
-
-        $returnArray = [];
-        foreach ($checkListFields AS $checkListField) {
-            $returnArray[$checkListField->getFormFieldName()]['fieldType'] = $checkListField->getChecklistFieldType()->getFormType();
-            $returnArray[$checkListField->getFormFieldName()]['fieldvalue'] = $itemContent[$checkListField->getFormFieldName()];
-        }
+        $answers = $checkListItem->getAnswersGiven();
+        $answers = $this->givenAnswerService->getGivenAnswersByChecklisItemtId($checkListItem->getId());
 
         return new JsonModel([
             'success' => $success,
             'errorMessage' => $errorMessage,
-            'itemContent' => $returnArray,
+            'itemContent' => $answers,
             'checkListItemId' => $checkListItem->getId()
         ]);
 
@@ -175,6 +170,9 @@ class CheckListAjaxController extends AbstractActionController
         $id = $this->params()->fromPost('id', 0);
         $formData = $this->params()->fromPost('formData', 0);
         $formDataArray = explode('&', $formData);
+
+
+
 
         if (empty($id)) {
             $success = false;
@@ -196,29 +194,27 @@ class CheckListAjaxController extends AbstractActionController
         $checklistItemId = array_shift($data)[1];
 
 
+
+
+
         if (empty($checklistItemId)) {
             $checkListItem = $this->checkListItemService->createCheckListItem();
             $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
-            $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
+            $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
             $action = 'add';
         } else {
             $checkListItem = $this->checkListItemService->getCheckListItemById($checklistItemId);
             $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
-            $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
+            $this->givenAnswerService->deleteAnswersGiven($checkListItem);
+            $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
             $action = 'update';
         }
 
-        foreach ($data AS $value) {
-            if ($value[0] == 'id') {
-                $id = $value[1];
-            }
-            $item[$value[0]] = urldecode($value[1]);
-        }
 
         return new JsonModel([
             'success' => $success,
             'errorMessage' => $errorMessage,
-            'item' => $item,
+            'item' => $answerData,
             'checkListItemId' => $checkListItem->getId(),
             'action' => $action
         ]);

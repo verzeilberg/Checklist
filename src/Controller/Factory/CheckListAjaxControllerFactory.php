@@ -23,7 +23,7 @@ class CheckListAjaxControllerFactory implements FactoryInterface
         $checkListItemService = new checkListItemService($entityManager);
         $checkListAnswerService = new checkListAnswerService($entityManager);
         $checkListFieldService = new checkListFieldService($entityManager);
-        $givenAnswerService = new givenAnswerService($entityManager, $checkListFieldService);
+        $givenAnswerService = new givenAnswerService($entityManager, $checkListFieldService, $checkListAnswerService);
 
         return new CheckListAjaxController(
             $entityManager,

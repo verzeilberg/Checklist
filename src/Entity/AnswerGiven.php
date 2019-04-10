@@ -45,7 +45,14 @@ class AnswerGiven extends UnityOfWork {
     private $checklistField;
 
     /**
-     * @ORM\Column(name="answer", type="text", nullable=false)
+     * Many AnswerGiven have one answer. This is the owning side.
+     * @ORM\ManyToOne(targetEntity="Answer", inversedBy="answersGiven")
+     * @ORM\JoinColumn(name="answer_id", referencedColumnName="id")
+     */
+    private $answerValue;
+
+    /**
+     * @ORM\Column(name="answer", type="text", nullable=true)
      */
     protected $answer;
 
@@ -129,8 +136,19 @@ class AnswerGiven extends UnityOfWork {
         $this->checklistField = $checklistField;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getAnswerValue()
+    {
+        return $this->answerValue;
+    }
 
-
-
-
+    /**
+     * @param mixed $answerValue
+     */
+    public function setAnswerValue($answerValue)
+    {
+        $this->answerValue = $answerValue;
+    }
 }

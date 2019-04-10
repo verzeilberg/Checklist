@@ -77,7 +77,13 @@ class CheckListItem extends UnityOfWork {
 
         $answersGiven = [];
         foreach ($this->answersGiven AS $answerGiven) {
-            $answersGiven[$answerGiven->getChecklistItem()->getId()] = $answerGiven->getAnswer();
+
+            $formType = $answerGiven->getChecklistField()->getChecklistFieldType()->getFormType();
+            if($formType == 'text') {
+                $answersGiven[$answerGiven->getChecklistItem()->getId()][$answerGiven->getChecklistField()->getId()][] = $answerGiven->getAnswer();
+            } else if($formType == 'checkbox') {
+                $answersGiven[$answerGiven->getChecklistItem()->getId()][$answerGiven->getChecklistField()->getId()][] = $answerGiven->getAnswerValue()->getId();
+            }
         }
 
         return $answersGiven;
@@ -91,6 +97,13 @@ class CheckListItem extends UnityOfWork {
         $this->answersGiven = $answersGiven;
     }
 
+
+    /**
+     * @return mixed
+     */
+    function getAnswersGivenForDeleting() {
+        return $this->answersGiven;
+    }
 
 
 }

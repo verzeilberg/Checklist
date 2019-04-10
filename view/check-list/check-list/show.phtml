@@ -51,7 +51,7 @@ $this->pageBreadcrumbs()->setItems([
                 <th class="text-center sorter-false"><input type="checkbox" id="checkAll" name="checkAll" value="1"/>
                 </th>
                 <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
-                    <th><?php echo $fields->getName(); ?></th>
+                    <th data-checklistfield="<?= $fields->getId(); ?>" class="checklistFieldHeader"><?php echo $fields->getName(); ?></th>
                 <?php } ?>
                 <th class="text-center"><i class="fas fa-cogs"></i></th>
             </tr>
@@ -61,32 +61,44 @@ $this->pageBreadcrumbs()->setItems([
 
             <?php if (count($checklist->getCheckListItems()) > 0) { ?>
                 <?php foreach ($checklist->getCheckListItems() AS $item) { ?>
-                    <?php $answers = $item->getAnswersGiven(); ?>
-                    <tr id="item-<?php echo $item->getId(); ?>">
+
+                    <?php
+                    $givenAnswersForCheckListItem = $givenAnswers[$item->getId()];
+                    ?>
+
+
+                    <tr id="checklistItem-<?php echo $item->getId(); ?>">
                         <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]"
                                                        value="<?php echo $item->getId(); ?>"/></td>
                         <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
-                            <td id="<?= $item->getId() . '_' . $fields->getId(); ?>" <?php echo($fields->getChecklistFieldType()->getFormType() == 'checkbox' ? 'class="text-center"' : '') ?> >
+                            <td data-checklistfield="<?= $fields->getId(); ?>" class="checklistField" id="checkListField-<?= $fields->getId(); ?>">
                                 <?php
-                                    echo $answers[$item->getId()];
+                                if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
+                                    foreach ($givenAnswersForCheckListItem[$fields->getId()] AS $answer) {
+                                        echo '<i class="fas fa-check-square"></i> ' . $answer . '<br/>';
+                                    }
+                                } else {
+                                    echo current($givenAnswersForCheckListItem[$fields->getId()]);
+                                }
                                 ?>
                             </td>
                         <?php } ?>
                         <td class="text-center">
-                            <button data-checklistitemid="<?= $item->getId(); ?>" class="btn btn-sm btn-secondary editChecklistItemOpen">
+                            <button data-checklistitemid="<?= $item->getId(); ?>"
+                                    class="btn btn-sm btn-secondary editChecklistItemOpen">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button data-checklistitemid="<?= $item->getId(); ?>" class="btn btn-sm btn-danger removeChecklistItemOpen ">
+                            <button data-checklistitemid="<?= $item->getId(); ?>"
+                                    class="btn btn-sm btn-danger removeChecklistItemOpen ">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
                     </tr>
                 <?php } ?>
             <?php } else { ?>
-                <tr>
-                    <td class="text-center" colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">Er zijn
-                        nog
-                        geen checklist items.
+                <tr class="noCheclistItems">
+                    <td class="text-center" colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">
+                        Er zijn nog geen checklist items.
                     </td>
                 </tr>
             <?php } ?>
@@ -172,9 +184,11 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
 
 
         //Click function to remove checklistitem
-        $(document).on('click', '.removeChecklistItemOpen', function (){
+        $(document).on('click', '.removeChecklistItemOpen', function () {
 
             var id = $(this).data('checklistitemid');
+
+            console.log(id);
 
             $.ajax({
                 url: '<?php echo $this->url('checklistajax', ['action' => 'delete-item']); ?>',
@@ -185,9 +199,10 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
                 async: true,
                 type: 'post',
                 success: function (response) {
-                    if(response.success == true) {
-                        $('tr#item-' + response.checklistItemId).fadeOut('fast',
-                            function(){});
+                    if (response.success == true) {
+                        $('tr#checklistItem-' + response.checklistItemId).fadeOut('fast',
+                            function () {
+                            });
 
                     } else {
                         alert(response.errorMessage);
