@@ -24,7 +24,7 @@ class CheckListField extends UnityOfWork
     protected $id;
 
     /**
-     * @ORM\Column(name="sort_order", type="integer", length=11, nullable=false)
+     * @ORM\Column(name="sort_order", type="integer", length=11, nullable=true)
      * @Annotation\Options({
      * "label": "Volgorde",
      * "label_attributes": {"class": ""}
@@ -50,7 +50,7 @@ class CheckListField extends UnityOfWork
     protected $formFieldName;
 
     /**
-     * @ORM\Column(name="required", type="integer", length=1, nullable=false)
+     * @ORM\Column(name="required", type="integer", length=1, nullable=true)
      * @Annotation\Type("Zend\Form\Element\Checkbox")
      * @Annotation\Options({
      * "label": "Verplicht",
@@ -58,7 +58,17 @@ class CheckListField extends UnityOfWork
      * })
      * @Annotation\Attributes({"class":""})
      */
-    protected $required = 999;
+    protected $required;
+
+    /**
+     * @ORM\Column(name="required_message", type="string", length=255, nullable=true)
+     *  @Annotation\Options({
+     * "label": "Validatie tekst",
+     * "label_attributes": {"class": ""}
+     * })
+     * @Annotation\Attributes({"class":"form-control", "placeholder":"Validatie tekst"})
+     */
+    protected $requiredMessage;
 
     /**
      * Many checklistfields have One Checklist.
@@ -244,6 +254,22 @@ class CheckListField extends UnityOfWork
     public function setAnswersGiven($answersGiven)
     {
         $this->answersGiven = $answersGiven;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRequiredMessage()
+    {
+        return $this->requiredMessage;
+    }
+
+    /**
+     * @param mixed $requiredMessage
+     */
+    public function setRequiredMessage($requiredMessage)
+    {
+        $this->requiredMessage = $requiredMessage;
     }
 
 

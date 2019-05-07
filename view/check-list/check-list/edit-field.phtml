@@ -33,15 +33,6 @@ echo $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist
 <div class="row">
     <div class="col">
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('order')); ?>
-            <?php echo $this->formNumber($form->get('order')); ?>
-            <?php echo $this->formElementErrors($form->get('order')); ?>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <div class="form-group">
             <?php echo $this->formLabel($form->get('name')); ?>
             <?php echo $this->formText($form->get('name')); ?>
             <?php echo $this->formElementErrors($form->get('name')); ?>
@@ -54,6 +45,15 @@ echo $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist
             <?php echo $this->formLabel($form->get('required')); ?>
             <?php echo $this->formCheckbox($form->get('required')); ?>
             <?php echo $this->formElementErrors($form->get('required')); ?>
+        </div>
+    </div>
+</div>
+<div class="row" id="requiredMessage">
+    <div class="col">
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('requiredMessage')); ?>
+            <?php echo $this->formText($form->get('requiredMessage')); ?>
+            <?php echo $this->formElementErrors($form->get('requiredMessage')); ?>
         </div>
     </div>
 </div>
@@ -96,7 +96,7 @@ echo $this->partial('partial/answers-library.phtml', ['answers' => $answers, 'fo
         });
 
         function showAnswers(selectedValue) {
-            if (selectedValue == 3) {
+            if (selectedValue == 3 || selectedValue == 11 || selectedValue == 12 ) {
                 $('#answers').show();
             } else {
                 $('#answers').hide();

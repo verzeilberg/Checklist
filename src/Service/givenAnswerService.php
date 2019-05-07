@@ -105,8 +105,12 @@ class givenAnswerService implements givenAnswerServiceInterface
                 $answer = $this->checkListAnswerService->getAnswerById($value[1]);
                 $answerGiven->setAnswerValue($answer);
                 $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
+            } else if ($formType == 'radio') {
+                $answer = $this->checkListAnswerService->getAnswerById($value[1]);
+                $answerGiven->setAnswerValue($answer);
+                $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
             } else {
-                $givenAnswer = $value[1];
+                $givenAnswer = urldecode($value[1]);
                 $answerData[$checklistField->getId()]['type'][$formType] = $givenAnswer;
             }
 

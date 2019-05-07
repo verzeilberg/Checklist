@@ -1,9 +1,18 @@
 <?php
 $value = '';
-if(is_object($checklistitem))
-{
+if (is_object($checklistitem)) {
     $values = $checklistitem->getItemContent();
     $value = $values[$checkListField->getFormFieldName()];
 }
 ?>
-<input class="form-control" <?php echo ($checkListField->getRequired() == 1? 'required':'') ?> value="<?php echo $value; ?>" type="<?php echo $checkListField->getChecklistFieldType()->getFormType(); ?>" name="<?= $checkListField->getId(); ?>" /><br/>
+<div class="form-row">
+    <div class="col">
+        <input class="form-control" <?php echo($checkListField->getRequired() == 1 ? 'required="required"' : '') ?>
+               value="<?php echo $value; ?>"
+               type="<?php echo $checkListField->getChecklistFieldType()->getFormType(); ?>"
+               name="<?= $checkListField->getId(); ?>"/>
+        <div class="invalid-feedback">
+            <?= $checkListField->getRequiredMessage(); ?>
+        </div>
+    </div>
+</div>

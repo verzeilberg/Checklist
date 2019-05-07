@@ -170,10 +170,6 @@ class CheckListAjaxController extends AbstractActionController
         $id = $this->params()->fromPost('id', 0);
         $formData = $this->params()->fromPost('formData', 0);
         $formDataArray = explode('&', $formData);
-
-
-
-
         if (empty($id)) {
             $success = false;
             $errorMessage = 'No id given';
