@@ -48,6 +48,14 @@ return [
             __DIR__ . '/../view', 
         ],
     ],
+    'view_helpers' => [
+        'factories' => [
+            View\Helper\CheckListHelper::class => View\Helper\Factory\CheckListHelperFactory::class,
+        ],
+        'aliases' => [
+            'checkListHelper' => View\Helper\CheckListHelper::class,
+        ],
+    ],
     'service_manager' => [
         'invokables' => [
             CheckList\checkListServiceInterface::class => Service\checkListService::class,

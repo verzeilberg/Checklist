@@ -165,8 +165,13 @@ class CheckListAjaxController extends AbstractActionController
 
     public function addChecklistItemAction()
     {
+        //Set variables
         $success = true;
-        $errorMessage = '';
+        $errorMessage = null;
+        $answerData = null;
+        $checkListId = null;
+        $action = null;
+
         $id = $this->params()->fromPost('id', 0);
         $formData = $this->params()->fromPost('formData', 0);
         $formDataArray = explode('&', $formData);
@@ -186,32 +191,37 @@ class CheckListAjaxController extends AbstractActionController
 
         }
 
-
         $checklistItemId = array_shift($data)[1];
 
+        //Check if data is valid
+        $valid = $this->givenAnswerService->validateAnswers($data);
+        if($valid) {
 
+            if (empty($checklistItemId)) {
+                $checkListItem = $this->checkListItemService->createCheckListItem();
+                $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
+                $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
+                $action = 'add';
+            } else {
+                $checkListItem = $this->checkListItemService->getCheckListItemById($checklistItemId);
+                $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
+                $this->givenAnswerService->deleteAnswersGiven($checkListItem);
+                $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
+                $action = 'update';
+            }
 
+            $checkListId = $checkListItem->getId();
 
-
-        if (empty($checklistItemId)) {
-            $checkListItem = $this->checkListItemService->createCheckListItem();
-            $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
-            $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
-            $action = 'add';
         } else {
-            $checkListItem = $this->checkListItemService->getCheckListItemById($checklistItemId);
-            $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
-            $this->givenAnswerService->deleteAnswersGiven($checkListItem);
-            $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
-            $action = 'update';
+            $success = false;
+            $errorMessage = 'Form is not valid!';
         }
-
 
         return new JsonModel([
             'success' => $success,
             'errorMessage' => $errorMessage,
             'item' => $answerData,
-            'checkListItemId' => $checkListItem->getId(),
+            'checkListItemId' => $checkListId,
             'action' => $action
         ]);
     }
@@ -406,22 +416,38 @@ class CheckListAjaxController extends AbstractActionController
     {
         $success = true;
         $errorMessage = '';
-        $checkListFields = $this->params()->fromPost('fields', '');
+        $checkListFields = $this->params()->fromPost('list', '');
 
-        foreach($checkListFields AS $index => $checkListFieldId) {
-
-           $sortOrder = $index + 1;
-
-            $checkListField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId);
-            $checkListField->setOrder($sortOrder);
-            $this->checkListFieldService->storeCheckListField($checkListField);
-        }
+        $this->saveChecklists($checkListFields);
 
         return new JsonModel([
             'success' => $success,
             'errorMessage' => $errorMessage
         ]);
 
+    }
+
+    private function saveChecklists($checkListFields, $parentCheckListField = null) {
+        foreach($checkListFields AS $index => $checkListFieldId) {
+
+            $sortOrder = $index + 1;
+            $checkListField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId['id']);
+            $checkListField->setOrder($sortOrder);
+            if(empty($parentCheckListField)) {
+                $checkListField->setParent(null);
+            } else {
+                $checkListField->setParent($parentCheckListField);
+            }
+
+            $this->checkListFieldService->storeCheckListField($checkListField);
+
+            if (count($checkListFieldId["children"]) > 0) {
+                $this->saveChecklists($checkListFieldId["children"], $checkListField);
+            }
+
+
+
+        }
     }
 
 }

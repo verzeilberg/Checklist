@@ -50,7 +50,11 @@ $this->pageBreadcrumbs()->setItems([
             <tr>
                 <th class="text-center sorter-false"><input type="checkbox" id="checkAll" name="checkAll" value="1"/>
                 </th>
-                <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
+                <?php foreach ($checklist->getCheckListFieldsForOverview() as $fields) { ?>
+                    <?php if ($fields->getChecklistFieldType()->getFormType() == 'fieldset  ') {
+                      continue;
+                    } ?>
+
                     <th data-checklistfield="<?= $fields->getId(); ?>"
                         class="checklistFieldHeader"><?php echo $fields->getName(); ?></th>
                 <?php } ?>
@@ -71,7 +75,10 @@ $this->pageBreadcrumbs()->setItems([
                     <tr id="checklistItem-<?php echo $item->getId(); ?>">
                         <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]"
                                                        value="<?php echo $item->getId(); ?>"/></td>
-                        <?php foreach ($checklist->getCheckListFields() as $fields) { ?>
+                        <?php foreach ($checklist->getCheckListFieldsForOverview() as $fields) { ?>
+                            <?php if ($fields->getChecklistFieldType()->getFormType() == 'fieldset') {
+                                continue;
+                            } ?>
                             <td data-checklistfield="<?= $fields->getId(); ?>" class="checklistField"
                                 id="checkListField-<?= $fields->getId(); ?>">
                                 <?php
@@ -82,6 +89,10 @@ $this->pageBreadcrumbs()->setItems([
                                 } elseif ($fields->getChecklistFieldType()->getFormType() == 'radio') {
                                     if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
                                         echo '<i class="fas fa-check-circle"></i> ' . current($givenAnswersForCheckListItem[$fields->getId()]);
+                                    }
+                                } elseif ($fields->getChecklistFieldType()->getFormType() == 'select') {
+                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
+                                        echo current($givenAnswersForCheckListItem[$fields->getId()]);
                                     }
                                 } else {
                                     echo current($givenAnswersForCheckListItem[$fields->getId()]);
@@ -130,8 +141,6 @@ echo $this->partial('check-list/partial/export-file.phtml', array('checklist' =>
 echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
 ?>
 <!-- End checklist item -->
-
-
 <script>
     $(document).ready(function () {
         $('#checkAll').change(function (e) {
@@ -145,6 +154,7 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
                 });
             }
         });
+
         /*
          * Click funtion to remove selected items
          */
@@ -156,11 +166,9 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
                     itemsToDelete.push($(this).val());
                 }
             });
-
             if (itemsToDelete.length > 0) {
                 var form_data = new FormData();
                 form_data.append('itemsToDelete', itemsToDelete);
-
                 $.ajax({
                     url: '<?php echo $this->url('checklistajax', ['action' => 'delete-items']); ?>',
                     dataType: 'json',
@@ -171,11 +179,9 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
                     async: true,
                     type: 'post',
                     success: function (response) {
-                        console.log(response.error);
-
                         if (response.error === false) {
                             $(response.deletedItems).each(function (index, value) {
-                                $('tr#item-' + value).slideUp("slow", function () {
+                                $('tr#checklistItem-' + value).slideUp("slow", function () {
                                     // Animation complete.
                                 });
                             });
@@ -191,11 +197,7 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
 
         //Click function to remove checklistitem
         $(document).on('click', '.removeChecklistItemOpen', function () {
-
             var id = $(this).data('checklistitemid');
-
-            console.log(id);
-
             $.ajax({
                 url: '<?php echo $this->url('checklistajax', ['action' => 'delete-item']); ?>',
                 dataType: 'json',
@@ -213,11 +215,8 @@ echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checkl
                     } else {
                         alert(response.errorMessage);
                     }
-
                 }
             });
         });
-
-
     });
 </script>

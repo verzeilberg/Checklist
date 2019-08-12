@@ -28,33 +28,9 @@ $form->setAttributes(array(
         <div class="col">
             <div class="form-group">
                 <label><?php echo $checkListField->getName(); ?><?php echo($checkListField->getRequired() == 1 ? '*' : '') ?></label>
-
-
                 <?php
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'text') {
-                    echo $this->partial('partials/input-text.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'number') {
-                    echo $this->partial('partials/input-number.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'checkbox') {
-                    echo $this->partial('partials/input-checkbox.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'textarea') {
-                    echo $this->partial('partials/input-textarea.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'date') {
-                    echo $this->partial('partials/input-datum.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'email') {
-                    echo $this->partial('partials/input-email.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'time') {
-                    echo $this->partial('partials/input-time.phtml', array('checkListField' => $checkListField));
-                }
-                if ($checkListField->getChecklistFieldType()->getFormType() == 'url') {
-                    echo $this->partial('partials/input-url.phtml', array('checkListField' => $checkListField));
-                }
+                $formTypeURL = 'partials/input-' . $checkListField->getChecklistFieldType()->getFormType() . '.phtml';
+                echo $this->partial($formTypeURL, array('checkListField' => $checkListField));
                 ?>
             </div>
         </div>

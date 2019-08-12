@@ -89,6 +89,22 @@ class givenAnswerService implements givenAnswerServiceInterface
         return $data;
     }
 
+    public function validateAnswers($data)
+    {
+        $valid = true;
+        foreach ($data AS $index => $value) {
+            $checkListFieldId = $value[0];
+            $checklistField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId);
+
+            if($checklistField->getRequired() && empty($value[1])) {
+                $valid = false;
+                break;
+            }
+        }
+
+        return $valid;
+    }
+
 
     public function saveAnswers($data, $checkListItem, $checklist)
     {
@@ -101,25 +117,47 @@ class givenAnswerService implements givenAnswerServiceInterface
             $checklistField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId);
             $givenAnswer = null;
             $formType = $checklistField->getChecklistFieldType()->getFormType();
-            if ($formType == 'checkbox') {
-                $answer = $this->checkListAnswerService->getAnswerById($value[1]);
-                $answerGiven->setAnswerValue($answer);
-                $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
-            } else if ($formType == 'radio') {
-                $answer = $this->checkListAnswerService->getAnswerById($value[1]);
-                $answerGiven->setAnswerValue($answer);
-                $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
+            $answer = null;
+
+
+            if($checklistField->getRequired() && empty($value[1])) {
+
+                $answerData[$checklistField->getId()]['type'][$formType][] = null;
+                $answerData[$checklistField->getId()]['valid'][] = false;
+
             } else {
-                $givenAnswer = urldecode($value[1]);
-                $answerData[$checklistField->getId()]['type'][$formType] = $givenAnswer;
+
+                if ($formType == 'checkbox') {
+                    $answer = $this->checkListAnswerService->getAnswerById($value[1]);
+                    $answerGiven->setAnswerValue($answer);
+                    $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
+                } else if ($formType == 'radio') {
+                    $answer = $this->checkListAnswerService->getAnswerById($value[1]);
+                    $answerGiven->setAnswerValue($answer);
+                    $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
+                } else if ($formType == 'select') {
+                    if (!empty($value[1])) {
+                        $answer = $this->checkListAnswerService->getAnswerById($value[1]);
+                        $answerGiven->setAnswerValue($answer);
+                        $answerData[$checklistField->getId()]['type'][$formType][] = $answer->getLabel();
+                    } else {
+                        $answerGiven->setAnswerValue($answer);
+                        $answerData[$checklistField->getId()]['type'][$formType][] = '';
+                    }
+                } else {
+                    $givenAnswer = urldecode($value[1]);
+                    $answerData[$checklistField->getId()]['type'][$formType] = $givenAnswer;
+                }
+
+                $answerData[$checklistField->getId()]['valid'][] = true;
+
+
+                $answerGiven->setChecklist($checklist);
+                $answerGiven->setChecklistItem($checkListItem);
+                $answerGiven->setChecklistField($checklistField);
+                $answerGiven->setAnswer($givenAnswer);
+                $this->setNewAnswerGiven($answerGiven, null);
             }
-
-            $answerGiven->setChecklist($checklist);
-            $answerGiven->setChecklistItem($checkListItem);
-            $answerGiven->setChecklistField($checklistField);
-            $answerGiven->setAnswer($givenAnswer);
-            $this->setNewAnswerGiven($answerGiven, null);
-
         }
 
         return (array)$answerData;

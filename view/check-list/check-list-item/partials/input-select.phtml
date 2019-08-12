@@ -1,0 +1,20 @@
+<?php
+$value = '';
+if (is_object($checklistitem)) {
+    $values = $checklistitem->getItemContent();
+    $value = $values[$checkListField->getFormFieldName()];
+}
+?>
+<div class="form-group">
+    <select type="select" name="<?= $checkListField->getId(); ?>"
+            class="form-control" <?= ($checkListField->getRequired() == 1 ? 'required' : '') ?>>
+        <option value="">--Maak uw keuze--</option>
+        <?php
+        foreach ($checkListField->getAnswers() AS $answer) { ?>
+            <option value="<?= $answer->getId(); ?>"><?= $answer->getLabel(); ?></option>
+        <?php } ?>
+    </select>
+    <div class="invalid-feedback">
+        <?= $checkListField->getRequiredMessage(); ?>
+    </div>
+</div>

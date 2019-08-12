@@ -34,6 +34,17 @@ class CheckListField extends UnityOfWork
     protected $order = 1;
 
     /**
+     * @ORM\Column(name="show_in_overview", type="integer", length=1, nullable=false)
+     * @Annotation\Type("Zend\Form\Element\Checkbox")
+     * @Annotation\Options({
+     * "label": "Toon in het overzicht",
+     * "label_attributes": {"class": "form-check-label col-md-3"}
+     * })
+     * @Annotation\Attributes({"class":""})
+     */
+    protected $showInOverview = 0;
+
+    /**
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      * @Annotation\Options({
      * "label": "Naam",
@@ -42,6 +53,16 @@ class CheckListField extends UnityOfWork
      * @Annotation\Attributes({"class":"form-control", "placeholder":"Naam"})
      */
     protected $name;
+
+    /**
+     * @ORM\Column(name="intro_text", type="text", nullable=true)
+     * @Annotation\Options({
+     * "label": "Intro tekst",
+     * "label_attributes": {"class": ""}
+     * })
+     * @Annotation\Attributes({"class":"form-control"})
+     */
+    protected $introText;
 
     /**
      * @ORM\Column(name="form_field_name", type="string", length=255, nullable=false)
@@ -54,11 +75,16 @@ class CheckListField extends UnityOfWork
      * @Annotation\Type("Zend\Form\Element\Checkbox")
      * @Annotation\Options({
      * "label": "Verplicht",
-     * "label_attributes": {"class": "form-check-label"}
+     * "label_attributes": {"class": "form-check-label col-md-3"}
      * })
      * @Annotation\Attributes({"class":""})
      */
     protected $required;
+
+    /**
+     * @ORM\Column(name="options", type="string", length=2555, nullable=true)
+     */
+    protected $options;
 
     /**
      * @ORM\Column(name="required_message", type="string", length=255, nullable=true)
@@ -110,10 +136,42 @@ class CheckListField extends UnityOfWork
      */
     private $answers;
 
+
+    /**
+     * One CheckListField has Many CheckListFields.
+     * @ORM\OneToMany(targetEntity="CheckListField", mappedBy="parent")
+     * @ORM\OrderBy({"order" = "ASC"})
+     */
+    private $children;
+
+    /**
+     * Many CheckListFields have One CheckListField.
+     * @ORM\ManyToOne(targetEntity="CheckListField", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     * @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
+     * @Annotation\Required(false)
+     * @Annotation\AllowEmpty
+     * @Annotation\Options({
+     * "target_class":"CheckList\Entity\CheckListField",
+     * "property": "name",
+     * "empty_option": "--Maak uw keuze--",
+     * "label": "Parent",
+     * "label_attributes": {},
+     * "find_method":{"name": "findBy","params": {
+     *     "criteria":{"dateDeleted": null},
+     *     "orderBy":{"name": "ASC"}
+     *     }
+     *  }
+     * })
+     * @Annotation\Attributes({"class": "form-control"})
+     */
+    private $parent;
+
     public function __construct()
     {
         $this->answers = new ArrayCollection();
         $this->answersGiven = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     public function addAnswers($answers)
@@ -270,6 +328,86 @@ class CheckListField extends UnityOfWork
     public function setRequiredMessage($requiredMessage)
     {
         $this->requiredMessage = $requiredMessage;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIntroText()
+    {
+        return $this->introText;
+    }
+
+    /**
+     * @param mixed $introText
+     */
+    public function setIntroText($introText)
+    {
+        $this->introText = $introText;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param mixed $children
+     */
+    public function setChildren($children)
+    {
+        $this->children = $children;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param mixed $parent
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getShowInOverview()
+    {
+        return $this->showInOverview;
+    }
+
+    /**
+     * @param mixed $showInOverview
+     */
+    public function setShowInOverview($showInOverview)
+    {
+        $this->showInOverview = $showInOverview;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOptions()
+    {
+        return stripslashes($this->options);
+    }
+
+    /**
+     * @param mixed $options
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
     }
 
 

@@ -45,19 +45,19 @@ $this->pageBreadcrumbs()->setItems([
                     <tr>
                         <td><?php echo $checkList->getName(); ?></td>
                         <td class="text-center">
-                            <a class="btn btn-sm btn-secondary" href="
+                            <a class="btn btn-sm  btn-warning" href="
                            <?= $this->url('beheer/checklist', ['action' => 'edit', 'id' => $checkList->getId()]); ?>">
                                 <i class="fas fa-edit"></i>
                             </a>
                             &nbsp;
-                            <a class="btn btn-sm btn-secondary" href="
-                           <?= $this->url('beheer/checklist', ['action' => 'show', 'id' => $checkList->getId()]); ?>">
-                                <i class="fas fa-search"></i>
-                            </a>
-                            &nbsp;
-                            <a class="btn btn-sm btn-secondary" href="
+                            <a class="btn btn-sm btn-success" href="
                            <?= $this->url('beheer/checklist', ['action' => 'add-field', 'id' => $checkList->getId()]); ?>">
                                 <i class="fas fa-plus-square"></i>
+                            </a>
+                            &nbsp;
+                            <a class="btn btn-sm btn-info" href="
+                           <?= $this->url('beheer/checklist', ['action' => 'show', 'id' => $checkList->getId()]); ?>">
+                                <i class="fas fa-list-alt"></i>
                             </a>
                             &nbsp;
                             <a class="btn btn-sm btn-secondary" href="

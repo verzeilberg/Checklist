@@ -205,9 +205,13 @@ class CheckListController extends AbstractActionController {
     public function addFieldAction() {
         $this->layout('layout/beheer');
         $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
-        $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery-ui.min.js');
         $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/checklist.css');
-        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/jquery-ui.min.css');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/bootstrap-iconpicker/bootstrap-iconpicker.min.css');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootstrap-iconpicker/bootstrap-iconpicker.bundle.min.js');
+        //Nested sortable
+        $this->viewhelpermanager->get('headScript')->appendFile('//code.jquery.com/ui/1.10.4/jquery-ui.min.js');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery.ui.nestedSortable.js');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -237,22 +241,30 @@ class CheckListController extends AbstractActionController {
 
         $answers = $this->checkListAnswerService->getAnswers();
         $searchLinks = $this->checkListAnswerService->getSearchLinks();
+        $checkListFields = $this->checkListFieldService->getCheckListFieldsByCheckListId($checklist);
 
         return new ViewModel([
             'checklist' => $checklist,
             'form' => $form,
             'formAnswer' => $formAnswer,
             'answers' => $answers,
-            'searchLinks' => $searchLinks
+            'searchLinks' => $searchLinks,
+            'checkListFields'=> $checkListFields
         ]);
     }
 
     public function editFieldAction() {
         $this->layout('layout/beheer');
+        //$this->viewhelpermanager->get('headScript')->appendFile('/js/options.js');
         $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
-        $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery-ui.min.js');
         $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/checklist.css');
-        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/jquery-ui.min.css');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/bootstrap-iconpicker/bootstrap-iconpicker.min.css');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootstrap-iconpicker/bootstrap-iconpicker.bundle.min.js');
+        //Nested sortable
+        $this->viewhelpermanager->get('headScript')->appendFile('//code.jquery.com/ui/1.10.4/jquery-ui.min.js');
+        $this->viewhelpermanager->get('headLink')->appendStylesheet('//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery.ui.nestedSortable.js');
+
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -281,6 +293,7 @@ class CheckListController extends AbstractActionController {
 
         $answers = $this->checkListAnswerService->getAnswers();
         $searchLinks = $this->checkListAnswerService->getSearchLinks();
+        $checkListFields = $this->checkListFieldService->getCheckListFieldsByCheckListId($checkList, $id);
 
         return new ViewModel([
             'checklist' => $checkList,
@@ -288,7 +301,8 @@ class CheckListController extends AbstractActionController {
             'formAnswer' => $formAnswer,
             'answers' => $answers,
             'checkListField' => $checkListField,
-            'searchLinks'=> $searchLinks
+            'searchLinks'=> $searchLinks,
+            'checkListFields'=> $checkListFields
         ]);
     }
 

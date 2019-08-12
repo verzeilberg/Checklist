@@ -1,0 +1,19 @@
+<?php
+$value = '';
+if (is_object($checklistitem)) {
+    $values = $checklistitem->getItemContent();
+    $value = $values[$checkListField->getFormFieldName()];
+}
+?>
+<div class="form-group">
+    <input list="list<?= $checkListField->getId(); ?>" name="<?= $checkListField->getId(); ?>" <?= ($checkListField->getRequired() == 1 ? 'required' : '') ?>>
+    <datalist id="list<?= $checkListField->getId(); ?>">
+        <?php
+        foreach ($checkListField->getAnswers() AS $answer) { ?>
+            <option value="<?= $answer->getId(); ?>"><?= $answer->getLabel(); ?>
+        <?php } ?>
+    </datalist>
+    <div class="invalid-feedback">
+        <?= $checkListField->getRequiredMessage(); ?>
+    </div>
+</div>

@@ -23,7 +23,7 @@ class CheckListItem extends UnityOfWork {
     protected $id;
 
     /**
-     * @ORM\Column(name="item_content", type="text", nullable=false)
+     * @ORM\Column(name="item_content", type="text", nullable=true)
      */
     protected $itemContent;
 

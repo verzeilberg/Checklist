@@ -31,6 +31,33 @@ class checkListFieldService implements checkListFieldServiceInterface {
 
     /**
      *
+     * Get object of an checklistitem by id
+     *
+     * @param       id $id of the checklistitem
+     * @return      object
+     *
+     */
+    public function getCheckListFieldsByCheckListId($checkList, $checkListFieldId = null) {
+        $checkListFields = $this->em->getRepository(CheckListField::class)
+            ->findBy(['checklist' => $checkList], []);
+
+        $qb = $this->em->getRepository(CheckListField::class)->createQueryBuilder('clf');
+        $qb->join('clf.checklist','cl');
+        $qb->where($qb->expr()->like('cl.id', ":checkListId"));
+        if(!empty($checkListFieldId)) {
+            $qb->andWhere($qb->expr()->neq('clf.id', ":checkListFieldId"));
+            $qb->setParameter('checkListFieldId', $checkListFieldId);
+        }
+
+        $qb->setParameter('checkListId', $checkList->getId());
+        $query = $qb->getQuery();
+        $checkListFields = $query->getResult();
+
+        return $checkListFields;
+    }
+
+    /**
+     *
      * Create a new checklistitem object
      *
      * @return      object

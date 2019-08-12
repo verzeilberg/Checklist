@@ -1,0 +1,101 @@
+<?php echo $this->form()->openTag($form); ?>
+    <input type="hidden" name="options" value='<?= (is_object($checkListField)?$checkListField->getOptions():''); ?>' />
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('name')); ?>
+                <?php echo $this->formText($form->get('name')); ?>
+                <?php echo $this->formElementErrors($form->get('name')); ?>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('showInOverview')); ?>
+                <label class="switch">
+                    <?php echo $this->formCheckbox($form->get('showInOverview')); ?>
+                    <span class="slider round"></span>
+                </label>
+                <?php echo $this->formElementErrors($form->get('showInOverview')); ?>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="introText">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('introText')); ?>
+                <?php echo $this->formTextArea($form->get('introText')); ?>
+                <?php echo $this->formElementErrors($form->get('introText')); ?>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="required">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('required')); ?>
+                <label class="switch">
+                    <?php echo $this->formCheckbox($form->get('required')); ?>
+                    <span class="slider round"></span>
+                </label>
+                <?php echo $this->formElementErrors($form->get('required')); ?>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row" id="requiredMessage">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('requiredMessage')); ?>
+                <?php echo $this->formText($form->get('requiredMessage')); ?>
+                <?php echo $this->formElementErrors($form->get('requiredMessage')); ?>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('checklistFieldType')); ?>
+                <?php
+                if(is_object($checkListField)) {
+                    echo $this->formSelect($form->get('checklistFieldType')->setAttributes(['disabled' => 'disabled']));
+                } else {
+                    echo $this->formSelect($form->get('checklistFieldType'));
+                }
+
+                 ?>
+                <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
+            </div>
+        </div>
+    </div>
+<?php
+echo $this->partial('partial/checklist-fields-type-options.phtml');
+?>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <?php echo $this->formLabel($form->get('parent')); ?>
+                <select name="parent" class="form-control">
+                    <option value="">--Maak uw keuze--</option>
+                    <?php foreach ($checkListFields AS $parentCheckListField) { ?>
+                        <option <?= (is_object($checkListField) && is_object($checkListField->getParent()) && $checkListField->getParent()->getId() == $parentCheckListField->getId() ? 'selected' : '') ?>
+                            value="<?= $parentCheckListField->getId(); ?>"><?= $parentCheckListField->getName(); ?></option>
+                    <?php } ?>
+                </select>
+                <?php echo $this->formElementErrors($form->get('parent')); ?>
+            </div>
+        </div>
+    </div>
+<?php
+echo $this->partial('partial/answers.phtml', ['answers' => $answers, 'checkListField' => $checkListField]);
+?>
+    <div class="row">
+        <div class="col">
+            <button type="submit" id="submit" class="btn btn-dark">Opslaan</button>
+        </div>
+        <div class="col text-right">
+            <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-dark" title="Annuleren">Annuleren</a>
+        </div>
+    </div>
+<?php echo $this->form()->closeTag($form); ?>

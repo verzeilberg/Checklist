@@ -1,0 +1,12 @@
+<fieldset>
+    <legend><?= $checkListField->getFormFieldName(); ?></legend>
+    <?php if (!empty($checkListField->getIntroText())) { ?>
+        <p><?= $checkListField->getIntroText(); ?></p>
+    <?php } ?>
+    <?php
+
+    if (count($checkListField->getChildren()) > 0) {
+        $urlHelper->checkListHelper()->showCheckListFields($checkListField->getChildren(), $urlHelper);
+    }
+    ?>
+</fieldset>

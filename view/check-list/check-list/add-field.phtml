@@ -28,82 +28,264 @@ echo $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist
 <!-- THIRD Page Header -->
 <div class="row">
     <h1 class="col">CHECKLIST FIELDS</h1>
-</div>
-<?php echo $this->form()->openTag($form); ?>
-<div class="row">
-    <div class="col">
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('name')); ?>
-            <?php echo $this->formText($form->get('name')); ?>
-            <?php echo $this->formElementErrors($form->get('name')); ?>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('required')); ?>
-            <?php echo $this->formCheckbox($form->get('required')); ?>
-            <?php echo $this->formElementErrors($form->get('required')); ?>
-        </div>
-    </div>
-</div>
-<div class="row" id="requiredMessage">
-    <div class="col">
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('requiredMessage')); ?>
-            <?php echo $this->formText($form->get('requiredMessage')); ?>
-            <?php echo $this->formElementErrors($form->get('requiredMessage')); ?>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('checklistFieldType')); ?>
-            <?php echo $this->formSelect($form->get('checklistFieldType')); ?>
-            <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
-        </div>
-    </div>
-</div>
-<?php
-echo $this->partial('partial/answers.phtml', ['answers' => $answers]);
+</div><?php
+echo $this->partial('partial/add-checklist-field-form.phtml', ['form'=>$form,'checklist' => $checklist, 'checkListField' => $checkListField, 'checkListFields' => $checkListFields]);
 ?>
-
-
-<div class="row">
-    <div class="col">
-        <button type="submit" id="submit" class="btn btn-dark">Opslaan</button>
-    </div>
-    <div class="col text-right">
-        <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-dark" title="Annuleren">Annuleren</a>
-    </div>
-</div>
-
-<?php echo $this->form()->closeTag($form); ?>
-
-
 <?php
 echo $this->partial('partial/answers-library.phtml', ['answers' => $answers, 'formAnswer' => $formAnswer, 'searchLinks' => $searchLinks]);
 ?>
-
-
 <script>
     $(document).ready(function () {
-        checkIfMandatory();
 
-        $('input[name=required]').change(function() {
-            console.log('asdsad');
+        $('#target').iconpicker();
+
+        $('#target').on('change', function(e) {
+            if (e.icon != '') {
+                $('input[name=apppreinput]').val();
+                $('input[name=apppreinput]').prop("disabled", true);
+                setPrependAppendValue('icon', e.icon);
+            } else {
+                $('input[name=apppreinput]').val();
+                $('input[name=apppreinput]').prop("disabled", false);
+                setPrependAppendValue('', '');
+            }
+        });
+
+        $('input[name=apppreinput]').on('keyup', function(e) {
+            if ($(this).val() != '') {
+                $('#target').prop("disabled", true);
+                setPrependAppendValue('text', $(this).val());
+            } else {
+                $('#target').prop("disabled", false);
+                setPrependAppendValue('', '');
+            }
+        });
+
+
+        var options = {};
+
+        /*
+         * Javascript voor options
+         */
+
+        maxLengthOption();
+
+        /* Read only */
+        $('input[name=readonly]').change(function () {
+            readOnlyOption();
+        });
+
+        function readOnlyOption() {
+            if ($('input[name=readonly]').prop('checked')) {
+                options.readonly = true;
+            } else {
+                delete options.readonly;
+            }
+
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        /* Disabled */
+        $('input[name=disabled]').change(function () {
+            disabledOption();
+        });
+
+        function disabledOption() {
+            if ($('input[name=disabled]').prop('checked')) {
+                options['disabled'] = true;
+            } else {
+                delete options['disabled'];
+            }
+
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        /* Max length */
+        $('input[name=maxlength]').change(function () {
+            maxLengthOption();
+        });
+
+        function maxLengthOption() {
+            if ($('input[name=maxlength]').prop('checked')) {
+                options['maxlength'] = {};
+                options['maxlength']['on'] = true;
+                functionSetMaxLengthOption();
+                $('input[name=maxLengthValue]').show();
+            } else {
+                $('input[name=maxLengthValue]').hide();
+                $('input[name=maxLengthValue]').val(255);
+                delete options['maxlength'];
+            }
+
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        /* Set max length */
+        $('input[name=maxLengthValue]').change(function () {
+            functionSetMaxLengthOption();
+        });
+
+        function functionSetMaxLengthOption(){
+            var maxLength = $('input[name=maxLengthValue]').val();
+            options['maxlength']['ml'] = maxLength;
+
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        /* Autocomplete */
+        $('input[name=autocomplete]').change(function () {
+            autoCompleteOption();
+        });
+
+        function autoCompleteOption() {
+            if ($('input[name=autocomplete]').prop('checked')) {
+                options['autocomplete'] = true;
+            } else {
+                delete options['autocomplete'];
+            }
+
+            var myJSON = JSON.stringify(options);
+            $('input[name=options]').val(myJSON, null, 2);
+        }
+
+        /* Autofocus */
+        $('input[name=autofocus]').change(function () {
+            autoFocusOption();
+        });
+
+        function autoFocusOption() {
+            if ($('input[name=autofocus]').prop('checked')) {
+                options['autofocus'] = true;
+            } else {
+                delete options['autofocus'];
+            }
+
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+
+        /* Append/Prepend */
+        $('input[name=prependappend]').change(function () {
+            prependAppendOption();
+        });
+
+        function prependAppendOption() {
+            if ($('input[name=prependappend]').prop('checked')) {
+                options['prependappend'] = {};
+                options['prependappend']['on'] = true;
+                functionSetPrependAppend();
+                $('#showPrependAppend').show();
+            } else {
+                delete options['prependappend'];
+                $('#showPrependAppend').hide();
+            }
+
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        /* Set prepend append */
+        $('input[name=preapp]').change(function () {
+            functionSetPrependAppend();
+        });
+
+        function functionSetPrependAppend(){
+            var preappend = $('input[name=preapp]:checked').val();
+            options['prependappend']['preapp'] = preappend;
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        function setPrependAppendValue(type, value) {
+            options['prependappend']['type'] = type;
+            options['prependappend']['value'] = value;
+            var myJSON = JSON.stringify(options, null, 2);
+            $('input[name=options]').val(myJSON);
+        }
+
+        /*
+         * End
+         */
+
+
+        /*
+         * Make checklist fields sortable
+         */
+        $('.sortable').nestedSortable({
+            disableNesting: 'no-nest',
+            forcePlaceholderSize: true,
+            handle: 'div',
+            helper: 'clone',
+            items: 'li',
+            maxLevels: 0,
+            opacity: .6,
+            placeholder: 'placeholder',
+            revert: 250,
+            tabSize: 25,
+            tolerance: 'pointer',
+            toleranceElement: '> div',
+            placeholder: "ui-state-highlight",
+            relocate: function (event, ui) {
+                list = $(this).nestedSortable('toHierarchy', {startDepthCount: 0, excludeRoot: true});
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        list: list,
+                    },
+                    url: "<?php echo $this->url('checklistajax', ['action' => 'orderCheckListFields']); ?>",
+                    async: true,
+                    success: function (data) {
+                        if (data.success === true) {
+                        } else {
+                            alert('fout');
+                        }
+
+                    }
+                });
+            }
+        });
+
+
+        checkIfMandatory();
+        checkIfIntroText();
+        getOptionsByFieldType();
+
+        $('input[name=required]').change(function () {
             checkIfMandatory();
         });
 
-        function checkIfMandatory(){
-            if($('input[name=required]').is(':checked')) {
+        $('select[name=checklistFieldType]').change(function () {
+            checkIfIntroText();
+        });
+
+        function checkIfMandatory() {
+            if ($('input[name=required]').is(':checked')) {
                 $('#requiredMessage').show();
             } else {
                 $('#requiredMessage').hide();
                 $('input[name=requiredMessage]').val('');
             }
+        }
+
+        function checkIfIntroText() {
+            var fieldType = $('select[name=checklistFieldType]').val();
+            if (fieldType == 13) {
+                $('#introText').show();
+                $('#required').hide();
+                $('input[name=required]').prop("checked", false);
+                checkIfMandatory();
+            } else {
+                $('#introText').hide();
+                $('#introText div div textarea').val('');
+                $('#required').show();
+                checkIfMandatory();
+            }
+
         }
 
         $('div#answers').hide();
@@ -112,47 +294,22 @@ echo $this->partial('partial/answers-library.phtml', ['answers' => $answers, 'fo
         $("select[name=checklistFieldType]").change(function () {
             var selectedValue = $(this).val();
             showAnswers(selectedValue);
+            getOptionsByFieldType();
 
         });
 
         function showAnswers(selectedValue) {
-            if (selectedValue == 3 || selectedValue == 11 || selectedValue == 12 ) {
+            if (selectedValue == 3 || selectedValue == 11 || selectedValue == 12) {
                 $('#answers').show();
             } else {
                 $('#answers').hide();
             }
         }
-        /*
-         * Sort the checklist fields
-         */
-        $(function () {
-            $("tbody#sortable").sortable({
-                stop: function (event, ui) {
-                    var fieldId;
-                    var fields = [];
-                    $("tbody#sortable tr").each(function (index) {
-                        ;
-                        $(this).children('td.index').text(index + 1);
-                        fieldId = $(this).data('fieldid');
-                        fields.push(fieldId);
-                    });
-                    $.ajax({
-                        type: 'POST',
-                        data: {
-                            fields: fields,
-                        },
-                        url: "<?php echo $this->url('checklistajax', ['action' => 'orderCheckListFields']); ?>",
-                        async: true,
-                        success: function (data) {
-                            if (data.success === true) {
-                            } else {
-                                alert('fout');
-                            }
 
-                        }
-                    });
-                }
-            });
-        });
+        function getOptionsByFieldType() {
+            var fieldTypeId = $('select[name=checklistFieldType]').val();
+            $('.optionField').hide();
+            $('#options' + fieldTypeId).show();
+        }
     });
 </script>

@@ -1,39 +1,14 @@
 <!-- Second Page Header -->
 <div class="row">
     <h1 class="col">FIELDS</h1>
+
 </div>
 <div class="row">
     <div class="col">
-        <table class="table table-dark table-sm table-bordered table-hover table-striped">
-            <thead class="thead-dark">
-            <tr>
-                <th>Volgorde</th>
-                <th>Naam</th>
-                <th>Type</th>
-                <th class="text-center"><i class="fas fa-cogs"></i></th>
-            </tr>
-            </thead>
-            <tbody id="sortable">
-
-            <?php foreach ($checklist->getCheckListFields() AS $field) { ?>
-                <tr data-fieldid="<?= $field->getId(); ?>">
-                    <td class="index"><?php echo $field->getOrder(); ?></td>
-                    <td><?php echo $field->getName(); ?></td>
-                    <td><?php echo $field->getChecklistFieldType()->getName(); ?></td>
-                    <td class="text-center">
-                        <a class="btn btn-sm btn-secondary" href="
-                   <?= $this->url('beheer/checklist', ['action' => 'edit-field', 'id' => $field->getId()]); ?>">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        &nbsp;
-                        <a class="btn btn-sm btn-danger" href="
-                   <?= $this->url('beheer/checklist', ['action' => 'delete-field', 'id' => $field->getId()]); ?>">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </td>
-                </tr>
-            <?php } ?>
-            </tbody>
-        </table>
+        <hr/>
+        <?php
+        $this->checkListHelper()->generateCheckListFields($checklist->getCheckListFields(), $this);
+        ?>
+        <hr/>
     </div>
 </div>

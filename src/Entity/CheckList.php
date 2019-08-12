@@ -7,6 +7,7 @@ use Zend\Form\Annotation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Application\Model\UnityOfWork;
 use CheckList\Entity\CheckListField;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * CheckList
@@ -58,7 +59,6 @@ class CheckList extends UnityOfWork {
     /**
      * One Checklist has Many CheckList items.
      * @ORM\OneToMany(targetEntity="CheckListField", mappedBy="checklist", cascade={"remove"})
-     * @ORM\OrderBy({"order" = "ASC"})
      */
     private $checkListFields;
 
@@ -119,7 +119,21 @@ class CheckList extends UnityOfWork {
     }
 
     function getCheckListFields() {
-        return $this->checkListFields;
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq("parent", null))
+            ->orderBy(["order" => Criteria::ASC]);
+
+        $checkListFields = $this->checkListFields->matching($criteria);
+        return $checkListFields;
+    }
+
+    function getCheckListFieldsForOverview() {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq("showInOverview", 1))
+            ->orderBy(["order" => Criteria::ASC]);
+
+        $checkListFields = $this->checkListFields->matching($criteria);
+        return $checkListFields;
     }
 
     function setCheckListFields($checkListFields) {

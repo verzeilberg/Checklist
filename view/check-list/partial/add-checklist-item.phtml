@@ -1,7 +1,7 @@
 <!-- Modal -->
-<div class="modal fade" id="addChecklistItem" tabindex="-1" role="dialog" aria-labelledby="addChecklistItemLabel"
+<div class="modal fade" id="addChecklistItem" tabindex="-1" role="dialog" data-toggle="model" aria-labelledby="addChecklistItemLabel"
      aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content bg-dark">
             <div class="modal-header">
                 <h4 class="modal-title" id="addChecklistItemLabel">Add checklist item</h4>
@@ -12,48 +12,10 @@
             <?php echo $this->form()->openTag($form); ?>
             <input type="hidden" name="id" id="checkListItemId" value=""/>
             <div class="modal-body">
-                <?php foreach ($checkListFields AS $checkListField) { ?>
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label><?php echo $checkListField->getName(); ?><?php echo($checkListField->getRequired() == 1 ? '*' : '') ?></label>
-
-
-                                <?php
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'text') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-text.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'number') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-number.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'checkbox') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-checkbox.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'textarea') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-textarea.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'date') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-datum.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'email') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-email.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'time') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-time.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'url') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-url.phtml', array('checkListField' => $checkListField));
-                                }
-                                if ($checkListField->getChecklistFieldType()->getFormType() == 'radio') {
-                                    echo $this->partial('check-list/check-list-item/partials/input-radio.phtml', array('checkListField' => $checkListField));
-                                }
-                                ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php
-                }
-                ?>
+                <div class="alert alert-danger" id="formErrorMessage">
+                    This is a danger alert—check it out!
+                </div>
+                <?php $this->checkListHelper()->showCheckListFields($checkListFields, $this); ?>
             </div>
             <div class="modal-footer">
                 <button type="button" id="addChecklistItemButton" class="btn btn-secondary">Opslaan</button>
@@ -126,7 +88,6 @@
             var formData = $("form#CheckListItem").serialize();
 
             var valid = validateForm('CheckListItem');
-
             if (valid == true) {
                 //Ajax call to add or edit checklist item. Based on given id.
                 $.ajax({
@@ -139,89 +100,105 @@
                     async: true,
                     type: 'post',
                     success: function (response) {
+                        //Check if response is success
+                        if (response.success) {
+                            //Hide error message and clear it
+                            $('#formErrorMessage').hide();
+                            $('#formErrorMessage').html('');
 
-                        //Check if row with empty checklist item is present
-                        if ($("#myTable tr.noCheclistItems").length > 0) {
-                            $("#myTable tr.noCheclistItems").remove();
-                        }
+                            //Check if row with empty checklist item is present
+                            if ($("#myTable tr.noCheclistItems").length > 0) {
+                                $("#myTable tr.noCheclistItems").remove();
+                            }
 
-                        if (response.action == 'add') { //If action is add than add a new row
+                            if (response.action == 'add') { //If action is add than add a new row
 
-                            //Because we are adding a new row in the table we create a new row
-                            var row = $('<tr id="checklistItem-' + response.checkListItemId + '">');
-                            //Add checkbox for multiple delete
-                            row.append($('<td class="text-center">').html('<input class="delete-item" type="checkbox" name="checked-items[]" value="' + response.checkListItemId + '"/>'));
+                                //Because we are adding a new row in the table we create a new row
+                                var row = $('<tr id="checklistItem-' + response.checkListItemId + '">');
+                                //Add checkbox for multiple delete
+                                row.append($('<td class="text-center">').html('<input class="delete-item" type="checkbox" name="checked-items[]" value="' + response.checkListItemId + '"/>'));
 
 
-                            $('#myTable').find('thead tr th.checklistFieldHeader').each(function (index) {
-                                var checkListFieldId = $(this).data('checklistfield');
-                                var checkListItemField = response.item[checkListFieldId];
-                                var content = '';
-                                if (typeof checkListItemField != 'undefined') {
+                                $('#myTable').find('thead tr th.checklistFieldHeader').each(function (index) {
+                                    var checkListFieldId = $(this).data('checklistfield');
+                                    var checkListItemField = response.item[checkListFieldId];
 
-                                    //Get item form type (text, checkbox, date, select etc.)
-                                    var itemFormType = Object.keys(checkListItemField.type)[0];
+                                    var content = '';
+                                    if (typeof checkListItemField != 'undefined') {
 
-                                    if (itemFormType == 'text') {
-                                        content = checkListItemField.type.text;
-                                    }
-                                    else if (itemFormType == 'number') {
-                                        content = checkListItemField.type.number;
-                                    }
-                                    else if (itemFormType == 'radio') {
+                                        //Get item form type (text, checkbox, date, select etc.)
+                                        var itemFormType = Object.keys(checkListItemField.type)[0];
+
+                                        if (itemFormType == 'text') {
+                                            content = checkListItemField.type.text;
+                                        }
+                                        else if (itemFormType == 'number') {
+                                            content = checkListItemField.type.number;
+                                        }
+                                        else if (itemFormType == 'radio') {
                                             content += '<i class="fas fa-check-circle"></i> ' + checkListItemField.type.radio;
+                                        }
+                                        else if (itemFormType == 'select') {
+                                            content += checkListItemField.type.select;
+                                        }
+                                        else if (itemFormType == 'checkbox') {
+                                            $.each(checkListItemField.type.checkbox, function (index, value) {
+                                                content += '<i class="fas fa-check-square"></i> ' + value + '<br/>'
+                                            });
+                                        }
                                     }
-                                    else if (itemFormType == 'checkbox') {
-                                        $.each(checkListItemField.type.checkbox, function (index, value) {
-                                            content += '<i class="fas fa-check-square"></i> ' + value + '<br/>'
-                                        });
+                                    row.append($('<td data-checklistfield="' + checkListFieldId + '" class="checklistField" id="checkListField-' + checkListFieldId + '">').html(content));
+                                });
+
+                                //Create edit button
+                                var buttons = '<button data-checklistitemid="' + response.checkListItemId + '" class="btn btn-sm btn-secondary editChecklistItemOpen">';
+                                buttons += '<i class="fas fa-edit"></i>';
+                                buttons += '</button>&nbsp;';
+                                buttons += '<button data-checklistitemid="' + response.checkListItemId + '" class="btn btn-sm btn-danger removeChecklistItemOpen ">';
+                                buttons += '<i class="fas fa-trash-alt"></i>';
+                                buttons += '</button>';
+                                row.append($('<td class="text-center">').html(buttons));
+                                $('#myTable > tbody#result').append(row);
+
+                            } else { //If action is edit than edit a row with new values
+
+                                $('#myTable').find('tr#checklistItem-' + response.checkListItemId + ' td.checklistField').each(function (index) {
+                                    var checkListFieldId = $(this).data('checklistfield');
+                                    var checkListItemField = response.item[checkListFieldId];
+                                    var content = '';
+                                    if (typeof checkListItemField != 'undefined') {
+
+                                        var itemFormType = Object.keys(checkListItemField.type)[0];
+
+                                        if (itemFormType == 'text') {
+                                            content = checkListItemField.type.text;
+                                        }
+                                        else if (itemFormType == 'number') {
+                                            content = checkListItemField.type.number;
+                                        }
+                                        else if (itemFormType == 'radio') {
+                                            content += '<i class="fas fa-check-circle"></i> ' + checkListItemField.type.radio;
+                                        }
+                                        else if (itemFormType == 'select') {
+                                            content += checkListItemField.type.select;
+                                        }
+                                        else if (itemFormType == 'checkbox') {
+                                            $.each(checkListItemField.type.checkbox, function (index, value) {
+                                                content += '<i class="fas fa-check-square"></i> ' + value + '<br/>'
+                                            });
+                                        }
                                     }
-                                }
-                                row.append($('<td data-checklistfield="' + checkListFieldId + '" class="checklistField" id="checkListField-' + checkListFieldId + '">').html(content));
+
+                                    $(this).html(content);
+                                });
+                            }
+                            $(function () {
+                                $('#addChecklistItem').modal('toggle');
                             });
-
-                            //Create edit button
-                            var buttons = '<button data-checklistitemid="' + response.checkListItemId + '" class="btn btn-sm btn-secondary editChecklistItemOpen">';
-                            buttons += '<i class="fas fa-edit"></i>';
-                            buttons += '</button>&nbsp;';
-                            buttons += '<button data-checklistitemid="' + response.checkListItemId + '" class="btn btn-sm btn-danger removeChecklistItemOpen ">';
-                            buttons += '<i class="fas fa-trash-alt"></i>';
-                            buttons += '</button>';
-                            row.append($('<td class="text-center">').html(buttons));
-                            $('#myTable > tbody#result').append(row);
-
-                        } else { //If action is edit than edit a row with new values
-
-                            $('#myTable').find('tr#checklistItem-' + response.checkListItemId + ' td.checklistField').each(function (index) {
-                                var checkListFieldId = $(this).data('checklistfield');
-                                var checkListItemField = response.item[checkListFieldId];
-                                var content = '';
-                                if (typeof checkListItemField != 'undefined') {
-
-                                    var itemFormType = Object.keys(checkListItemField.type)[0];
-
-                                    if (itemFormType == 'text') {
-                                        content = checkListItemField.type.text;
-                                    }
-                                    else if (itemFormType == 'number') {
-                                        content = checkListItemField.type.number;
-                                    }
-                                    else if (itemFormType == 'radio') {
-                                        content += '<i class="fas fa-check-circle"></i> ' + checkListItemField.type.radio;
-                                    }
-                                    else if (itemFormType == 'checkbox') {
-                                        $.each(checkListItemField.type.checkbox, function (index, value) {
-                                            content += '<i class="fas fa-check-square"></i> ' + value + '<br/>'
-                                        });
-                                    }
-                                }
-
-                                $(this).html(content);
-                            });
+                        } else {
+                            $('#formErrorMessage').html(response.errorMessage);
+                            $('#formErrorMessage').show();
                         }
-                        $(function () {
-                            $('#addChecklistItem').modal('toggle');
-                        });
                     }
                 });
             } else {
@@ -238,16 +215,20 @@
             $('form#CheckListItem input[type=radio]').prop("checked", false);
             $('form#CheckListItem input[type=checkbox]').prop("checked", false);
 
+            $('#formErrorMessage').hide();
+            $('#formErrorMessage').html('');
+
         }
 
         function validateForm(formId) {
             var valid = true;
-            $("form#" + formId + " input[required]").each(function () {
+            $("form#" + formId + " input[required], form#" + formId + " select[required]").each(function () {
                 var inputType = $(this).attr('type');
 
                 if (inputType == 'text' ||
-                    inputType == 'number') {
-
+                    inputType == 'number' ||
+                    inputType == 'select' ||
+                    inputType == 'date') {
                     var value = $(this).val();
                     if (value == '') {
                         valid = false;
@@ -257,8 +238,8 @@
                     }
                 } else if (inputType == 'radio') {
                     var name = $(this).attr('name');
-                    var cbCount = $('input[name="'+name+'"]:checked').length;
-                    if(cbCount == 0) {
+                    var rdCount = $('input[name="' + name + '"]:checked').length;
+                    if (rdCount == 0) {
                         valid = false;
                         $(this).addClass('is-invalid');
                     } else {
@@ -266,11 +247,8 @@
                     }
                 } else if (inputType == 'checkbox') {
                     var name = $(this).attr('name');
-
-                    var cbCount = $('input[name="'+name+'"]:checked').length;
-                    console.log(cbCount)
-
-                    if(cbCount == 0) {
+                    var cbCount = $('input[name="' + name + '"]:checked').length;
+                    if (cbCount == 0) {
                         valid = false;
                         $(this).addClass('is-invalid');
                     } else {
@@ -278,7 +256,6 @@
                     }
                 }
             });
-
             return valid;
         }
     });
