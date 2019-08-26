@@ -39,7 +39,6 @@ class CheckList extends UnityOfWork {
      * @Annotation\Type("Zend\Form\Element\Radio")
      * @Annotation\Options({
      * "label": "Type lijst",
-     * "empty_option": "---",
      * "value_options":{
      * "1":"Publiek",
      * "2":"Persoonlijk",
@@ -49,6 +48,22 @@ class CheckList extends UnityOfWork {
      * @Annotation\Attributes({"class":"form-check-input"})
      */
     protected $public;
+
+    /**
+     * @ORM\Column(name="autocomplete", type="integer", length=1, nullable=false)
+     * @Annotation\Type("Zend\Form\Element\Radio")
+     * @Annotation\Options({
+     * "label": "Autocomplete",
+     * "empty_option": "---",
+     * "value_options":{
+     * "1":"Nee",
+     * "2":"Ja",
+     * },
+     * "label_attributes": {"class": "form-check-label"}
+     * })
+     * @Annotation\Attributes({"class":"form-check-input"})
+     */
+    protected $autocomplete = 1;
 
     /**
      * One Checklist has Many CheckList items.
@@ -174,6 +189,22 @@ class CheckList extends UnityOfWork {
     public function setAnswersGiven($answersGiven)
     {
         $this->answersGiven = $answersGiven;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAutocomplete()
+    {
+        return $this->autocomplete;
+    }
+
+    /**
+     * @param mixed $autocomplete
+     */
+    public function setAutocomplete($autocomplete)
+    {
+        $this->autocomplete = $autocomplete;
     }
 
 

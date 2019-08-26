@@ -1,7 +1,8 @@
-<div id="options1" class="optionField">
+<!-- Options field voor text input  -->
+<div id="optionField">
     <fieldset>
         <legend>Options</legend>
-        <div class="form-group row">
+        <div class="form-group row option options1 options2 options4">
             <label for="readonly" class="col-sm-2 col-form-label">Read only</label>
             <div class="col-sm-10">
                 <label class="switch">
@@ -10,7 +11,7 @@
                 </label>
             </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row option options1 options2 options4">
             <label for="disabled" class="col-sm-2 col-form-label">Disabled</label>
             <div class="col-sm-10">
                 <label class="switch">
@@ -19,7 +20,7 @@
                 </label>
             </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row option options1 options4">
             <label for="maxlength" class="col-sm-2 col-form-label">Max length</label>
             <div class="col-sm-auto">
                 <label class="switch">
@@ -28,19 +29,10 @@
                 </label>
             </div>
             <div class="col-sm-2">
-                <input type="number" value="255" class="form-control" min="1" max="255" name="maxLengthValue"/>
+                <input type="number" value="" class="form-control" min="1" max="255" name="maxLengthValue"/>
             </div>
         </div>
-        <div class="form-group row">
-            <label for="autocomplete" class="col-sm-2 col-form-label">Autocomplete</label>
-            <div class="col-sm-10">
-                <label class="switch">
-                    <input type="checkbox" name="autocomplete" value="1">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-        </div>
-        <div class="form-group row">
+        <div class="form-group row option options1 options2 options4">
             <label for="Autofocus" class="col-sm-2 col-form-label">autofocus</label>
             <div class="col-sm-10">
                 <label class="switch">
@@ -50,8 +42,8 @@
             </div>
         </div>
 
-        <div class="form-group row">
-            <label for="Autofocus" class="col-sm-2 col-form-label">Prepend/Append</label>
+        <div class="form-group row option options1 options2">
+            <label for="prependappend" class="col-sm-2 col-form-label">Prepend/Append</label>
             <div class="col-sm-auto">
                 <label class="switch">
                     <input type="checkbox" name="prependappend" value="1">
@@ -82,19 +74,39 @@
             </div>
         </div>
 
+        <div class="form-group row option options4">
+            <label for="resize" class="col-sm-2 col-form-label">Resize</label>
+            <div class="col-sm-10">
+                <label class="switch">
+                    <input type="checkbox" name="resize" value="1">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        <div class="form-group row option options4">
+            <label for="readonly" class="col-sm-2 col-form-label">Afmeting</label>
+            <div class="col-sm-auto">
+                <label class="switch">
+                    <input type="checkbox" name="measurements" value="1">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div id="textareaMeasurements" class="col">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <input type="text" value="" placeholder="width" class="form-control" name="textareawidth"/>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" value="" placeholder="height" class="form-control" name="textareaheigt"/>
+                    </div>
+                    <div class="col-sm-2">
+                        <select class="form-control" name="measurementsType">
+                            <option value="px" selected>px</option>
+                            <option value="%">%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </fieldset>
-</div>
-
-<div id="options2" class="optionField">
-    <fieldset>
-        <legend>Options</legend>
-    </fieldset>
-
-</div>
-
-<div id="options6" class="optionField">
-    <fieldset>
-        <legend>Options</legend>
-    </fieldset>
-
 </div>

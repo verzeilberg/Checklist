@@ -40,25 +40,44 @@ class CheckListHelper extends AbstractHelper
 
     }
 
-    public function showCheckListFields($checkListFields,$urlHelper)
+    public function showCheckListFields($checkListFields, $urlHelper)
     {
         foreach ($checkListFields AS $checkListField) {
             echo '<div class="row">';
-            echo    '<div class="col">';
-            echo        '<div class="form-group">';
+            echo '<div class="col">';
+            echo '<div class="form-group">';
             if ($checkListField->getChecklistFieldType()->getFormType() != 'fieldset') {
                 echo '<label>' . $checkListField->getName() . ($checkListField->getRequired() == 1 ? ' *' : '') . '</label>';
             }
-                            $formTypeURL = 'check-list/check-list-item/partials/input-' . $checkListField->getChecklistFieldType()->getFormType() . '.phtml';
-            echo            $urlHelper->partial($formTypeURL, array('checkListField' => $checkListField, 'urlHelper' => $urlHelper));
-            echo        '</div>';
-            echo    '</div>';
+            $formTypeURL = 'check-list/check-list-item/partials/input-' . $checkListField->getChecklistFieldType()->getFormType() . '.phtml';
+            echo $urlHelper->partial($formTypeURL, array('checkListField' => $checkListField, 'urlHelper' => $urlHelper));
+            echo '</div>';
+            echo '</div>';
             echo '</div>';
 
-            if(count($checkListField->getChildren()) > 0 && $checkListField->getChecklistFieldType()->getFormType() != 'fieldset') {
+            if (count($checkListField->getChildren()) > 0 && $checkListField->getChecklistFieldType()->getFormType() != 'fieldset') {
                 $this->showCheckListFields($checkListField->getChildren(), $urlHelper);
             }
 
         }
     }
+
+
+    public function createFormRadioInputs($formInput)
+    {
+        $values = $formInput->getOptions()['value_options'];
+        echo '<div class="form-group">';
+        echo '<label>'.$formInput->getLabel().'</label>';
+        foreach ($values as $index => $value) {
+            echo '<div class="form-check">';
+            echo '<input class="form-check-input" type="radio" name="'.$formInput->getName().'" value="'.$index.'" '.($formInput->getValue() == $index? 'checked':'').'>';
+            echo '    <label class="form-check-label" for="exampleRadios1">';
+            echo        $value;
+            echo '    </label>';
+            echo '</div>';
+        }
+        echo '</div>';
+    }
+
+
 }

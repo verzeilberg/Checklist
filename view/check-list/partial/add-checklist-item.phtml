@@ -1,4 +1,9 @@
 <!-- Modal -->
+<?php
+$form->setAttributes(array(
+'autocomplete' => ($checklist->getAutocomplete() == 2? "on":"off")
+));
+?>
 <div class="modal fade" id="addChecklistItem" tabindex="-1" role="dialog" data-toggle="model" aria-labelledby="addChecklistItemLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -12,9 +17,6 @@
             <?php echo $this->form()->openTag($form); ?>
             <input type="hidden" name="id" id="checkListItemId" value=""/>
             <div class="modal-body">
-                <div class="alert alert-danger" id="formErrorMessage">
-                    This is a danger alert—check it out!
-                </div>
                 <?php $this->checkListHelper()->showCheckListFields($checkListFields, $this); ?>
             </div>
             <div class="modal-footer">
@@ -220,15 +222,17 @@
 
         }
 
+
+        /*
+         * Validate form
+         */
         function validateForm(formId) {
             var valid = true;
-            $("form#" + formId + " input[required], form#" + formId + " select[required]").each(function () {
-                var inputType = $(this).attr('type');
-
-                if (inputType == 'text' ||
-                    inputType == 'number' ||
-                    inputType == 'select' ||
-                    inputType == 'date') {
+            $("form#" + formId + " input[required], form#" + formId + " select[required], form#" + formId + " textarea[required]").each(function () {
+                if ($(this).is("text") ||
+                    $(this).is("number") ||
+                    $(this).is("select") ||
+                    $(this).is("date")) {
                     var value = $(this).val();
                     if (value == '') {
                         valid = false;
@@ -236,7 +240,7 @@
                     } else {
                         $(this).removeClass('is-invalid');
                     }
-                } else if (inputType == 'radio') {
+                } else if ($(this).is("radio")) {
                     var name = $(this).attr('name');
                     var rdCount = $('input[name="' + name + '"]:checked').length;
                     if (rdCount == 0) {
@@ -245,10 +249,18 @@
                     } else {
                         $(this).removeClass('is-invalid');
                     }
-                } else if (inputType == 'checkbox') {
+                } else if ($(this).is("checkbox")) {
                     var name = $(this).attr('name');
                     var cbCount = $('input[name="' + name + '"]:checked').length;
                     if (cbCount == 0) {
+                        valid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                } else if ($(this).is("textarea")) {
+                    var value = $(this).val();
+                    if (value == '') {
                         valid = false;
                         $(this).addClass('is-invalid');
                     } else {

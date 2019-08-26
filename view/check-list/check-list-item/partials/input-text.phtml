@@ -4,13 +4,77 @@ if (is_object($checklistitem)) {
     $values = $checklistitem->getItemContent();
     $value = $values[$checkListField->getFormFieldName()];
 }
+
+/*
+ * Get options from check list field
+ */
+$options = $checkListField->getOptionsAsArray();
+
+/*
+ * Check if readonly is checked
+ */
+$readonly = (array_key_exists('readonly',$options)? $options['readonly']: false);
+
+/*
+ * Check if disabled is checked
+ */
+$disabled = (array_key_exists('disabled',$options)? $options['disabled']: false);
+
+/*
+ * Check if maxlength is checked and get the maxlength
+ */
+$maxlength = (
+        array_key_exists('maxlength',$options) &&
+        array_key_exists('on',$options['maxlength'])  &&
+        $options['maxlength']['on'] == 'true'    ? $options['maxlength']['ml']: false
+);
+
+/*
+ * Check if autofocus is checked
+ */
+$autofocus = (array_key_exists('autofocus',$options)? $options['autofocus']: false);
+
+
+/*
+ * Check if prependappend is checked and get the type (icon/text) and the value
+ */
+$prependappend = (array_key_exists('prependappend',$options) &&
+    array_key_exists('on',$options['prependappend'])? $options['prependappend']:false);
+$prependappendPreApp= $prependappend['preapp'];
+$prependappendType = $prependappend['type'];
+$prependappendValue = $prependappend['value'];
+$preappValue = null;
+if ($prependappendType == 'icon') {
+    $preappValue = '<i class="'.$prependappendValue.'"></i>';
+} else if ($prependappendType == 'text') {
+    $preappValue = $prependappendValue;
+}
+
+
 ?>
 <div class="form-row">
     <div class="col">
-        <input class="form-control" <?php echo($checkListField->getRequired() == 1 ? 'required="required"' : '') ?>
-               value="<?php echo $value; ?>"
-               type="<?php echo $checkListField->getChecklistFieldType()->getFormType(); ?>"
-               name="<?= $checkListField->getId(); ?>"/>
+        <div class="input-group mb-3">
+            <?php if ($prependappendPreApp == 'pre') { ?>
+            <div class="input-group-prepend">
+                <span class="input-group-text"><?= $preappValue ?></span>
+            </div>
+            <?php } ?>
+            <input class="form-control" <?php echo($checkListField->getRequired() == 1 ? 'required="required"' : '') ?>
+                   value="<?php echo $value; ?>"
+                   type="<?php echo $checkListField->getChecklistFieldType()->getFormType(); ?>"
+                   name="<?= $checkListField->getId(); ?>"
+                   <?= ($readonly?'readonly':''); ?>
+                   <?= ($disabled?'disabled':''); ?>
+                   <?= ($maxlength != false?'maxlength="'.$maxlength.'"':''); ?>
+                   <?= ($autofocus?'autofocus':''); ?>
+            />
+            <?php if ($prependappendPreApp == 'app') { ?>
+                <div class="input-group-append">
+                    <span class="input-group-text"><?= $preappValue ?></span>
+                </div>
+            <?php } ?>
+        </div>
         <div class="invalid-feedback">
             <?= $checkListField->getRequiredMessage(); ?>
         </div>

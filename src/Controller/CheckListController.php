@@ -213,6 +213,8 @@ class CheckListController extends AbstractActionController {
         $this->viewhelpermanager->get('headLink')->appendStylesheet('//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
         $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery.ui.nestedSortable.js');
 
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/options.js');
+
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
             return $this->redirect()->toRoute('beheer/checklist');
@@ -265,6 +267,7 @@ class CheckListController extends AbstractActionController {
         $this->viewhelpermanager->get('headLink')->appendStylesheet('//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
         $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery.ui.nestedSortable.js');
 
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/options.js');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {

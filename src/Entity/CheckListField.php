@@ -399,7 +399,12 @@ class CheckListField extends UnityOfWork
      */
     public function getOptions()
     {
-        return stripslashes($this->options);
+        return $this->options;
+    }
+
+    public function getOptionsAsArray()
+    {
+        return json_decode(stripslashes($this->options), 1);
     }
 
     /**

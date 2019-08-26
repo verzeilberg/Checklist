@@ -30,9 +30,17 @@ $form->setAttributes(array(
                 <?php echo $this->formText($form->get('name')); ?>
                 <?php echo $this->formElementErrors($form->get('name')); ?>
             </div>
-            <div class="form-check">
-                <?php echo $this->formRadio($form->get('public')); ?>
-                <?php echo $this->formElementErrors($form->get('name')); ?>
+            <?php
+            $this->checkListHelper()->createFormRadioInputs($form->get('public'));
+            ?>
+            <div class="col-sm-5 col-md-5 col-lg-5">
+                <?php echo $this->formElementErrors($form->get('public')); ?>
+            </div>
+            <?php
+            $this->checkListHelper()->createFormRadioInputs($form->get('autocomplete'));
+            ?>
+            <div class="col-sm-5 col-md-5 col-lg-5">
+                <?php echo $this->formElementErrors($form->get('autocomplete')); ?>
             </div>
         </div>
     </div>
