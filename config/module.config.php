@@ -50,7 +50,7 @@ return [
     ],
     'view_helpers' => [
         'factories' => [
-            View\Helper\CheckListHelper::class => View\Helper\Factory\CheckListHelper::class,
+            View\Helper\CheckListHelper::class => View\Helper\Factory\CheckListHelperFactory::class,
         ],
         'aliases' => [
             'checkListHelper' => View\Helper\CheckListHelper::class,
