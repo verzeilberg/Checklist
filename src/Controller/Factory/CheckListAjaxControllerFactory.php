@@ -5,7 +5,7 @@ use CheckList\Service\checkListFieldService;
 use CheckList\Service\givenAnswerService;
 use Interop\Container\ContainerInterface;
 use CheckList\Controller\CheckListAjaxController;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use CheckList\Service\checkListService;
 use CheckList\Service\checkListItemService;
 use CheckList\Service\checkListAnswerService;

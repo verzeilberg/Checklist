@@ -3,7 +3,7 @@ namespace CheckList\Controller\Factory;
 
 use Interop\Container\ContainerInterface;
 use YouTube\Controller\IndexController;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use YouTube\Service\youTubeService;
 /**
  * This is the factory for AuthController. Its purpose is to instantiate the controller

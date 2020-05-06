@@ -3,7 +3,7 @@
 namespace CheckList\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zend\Form\Annotation;
+use Laminas\Form\Annotation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Application\Model\UnityOfWork;
 
@@ -35,7 +35,7 @@ class CheckListField extends UnityOfWork
 
     /**
      * @ORM\Column(name="show_in_overview", type="integer", length=1, nullable=false)
-     * @Annotation\Type("Zend\Form\Element\Checkbox")
+     * @Annotation\Type("Laminas\Form\Element\Checkbox")
      * @Annotation\Options({
      * "label": "Toon in het overzicht",
      * "label_attributes": {"class": "form-check-label col-md-3"}
@@ -72,7 +72,7 @@ class CheckListField extends UnityOfWork
 
     /**
      * @ORM\Column(name="required", type="integer", length=1, nullable=true)
-     * @Annotation\Type("Zend\Form\Element\Checkbox")
+     * @Annotation\Type("Laminas\Form\Element\Checkbox")
      * @Annotation\Options({
      * "label": "Verplicht",
      * "label_attributes": {"class": "form-check-label col-md-3"}

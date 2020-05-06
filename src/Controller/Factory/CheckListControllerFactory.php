@@ -3,7 +3,7 @@ namespace CheckList\Controller\Factory;
 
 use Interop\Container\ContainerInterface;
 use CheckList\Controller\CheckListController;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use CheckList\Service\checkListService;
 use CheckList\Service\checkListItemService;
 use CheckList\Service\checkListFieldService;

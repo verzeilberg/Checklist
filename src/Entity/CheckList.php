@@ -3,7 +3,7 @@
 namespace CheckList\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zend\Form\Annotation;
+use Laminas\Form\Annotation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Application\Model\UnityOfWork;
 use CheckList\Entity\CheckListField;
@@ -36,7 +36,7 @@ class CheckList extends UnityOfWork {
 
     /**
      * @ORM\Column(name="public", type="integer", length=1, nullable=false)
-     * @Annotation\Type("Zend\Form\Element\Radio")
+     * @Annotation\Type("Laminas\Form\Element\Radio")
      * @Annotation\Options({
      * "label": "Type lijst",
      * "value_options":{
@@ -51,7 +51,7 @@ class CheckList extends UnityOfWork {
 
     /**
      * @ORM\Column(name="autocomplete", type="integer", length=1, nullable=false)
-     * @Annotation\Type("Zend\Form\Element\Radio")
+     * @Annotation\Type("Laminas\Form\Element\Radio")
      * @Annotation\Options({
      * "label": "Autocomplete",
      * "empty_option": "---",

@@ -3,8 +3,8 @@
 namespace CheckList;
 
 use CheckList\Entity\CheckList;
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Segment;
+use Laminas\Router\Http\Literal;
+use Laminas\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [

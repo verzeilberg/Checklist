@@ -2,7 +2,7 @@
 
 namespace CheckList\Service;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use CheckList\Entity\CheckList;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;

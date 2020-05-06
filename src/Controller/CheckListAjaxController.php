@@ -2,9 +2,9 @@
 
 namespace CheckList\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\Authentication\Result;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\Authentication\Result;
 
 /**
  * This controller is responsible for letting the user to log in and log out.
