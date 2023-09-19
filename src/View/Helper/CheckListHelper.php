@@ -3,6 +3,7 @@
 namespace CheckList\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
+use Symfony\Component\VarDumper\VarDumper;
 
 // This view helper class translate text
 class CheckListHelper extends AbstractHelper
@@ -30,7 +31,7 @@ class CheckListHelper extends AbstractHelper
             echo '</a>';
             echo '</div>';
 
-            if (count($field->getChildren() > 0)) {
+            if (count($field->getChildren()??[] > 0)) {
                 $this->generateCheckListFields($field->getChildren(), $urlHelper, 1);
             }
             echo '</li>';

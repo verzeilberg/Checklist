@@ -1,81 +1,105 @@
-<?php echo $this->form()->openTag($form); ?>
+<?php $form->prepare(); ?>
+<?= $this->form()->openTag($form); ?>
+<?= $this->formRow($form->get('csrf')); ?>
     <input type="hidden" name="options" value='<?= (is_object($checkListField)?$checkListField->getOptions():''); ?>' />
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <?php echo $this->formLabel($form->get('name')); ?>
-                <?php echo $this->formText($form->get('name')); ?>
-                <?php echo $this->formElementErrors($form->get('name')); ?>
+
+<?php
+$fieldset = $form->get('checklist-field');
+$name = $fieldset->get('name');
+?>
+    <div class="row mb-2">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <?= $this->formLabel($name) ?>
+            <div class="input-group mb-2 mt-2">
+                <?= $this->formElement($name) ?>
+                <small class="form-text text-danger"> <?= $this->formElementErrors()->render($name) ?></small>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <?php echo $this->formLabel($form->get('showInOverview')); ?>
+<?php
+$showInOverview = $fieldset->get('showInOverview');
+?>
+    <div class="row mb-2">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <?php echo $this->formLabel($showInOverview); ?>
+            <div class="input-group mb-2 mt-2">
                 <label class="switch">
-                    <?php echo $this->formCheckbox($form->get('showInOverview')); ?>
+                    <?php echo $this->formCheckbox($showInOverview); ?>
                     <span class="slider round"></span>
                 </label>
-                <?php echo $this->formElementErrors($form->get('showInOverview')); ?>
+                <?php echo $this->formElementErrors($showInOverview); ?>
             </div>
         </div>
     </div>
-    <div class="row" id="introText">
-        <div class="col">
-            <div class="form-group">
-                <?php echo $this->formLabel($form->get('introText')); ?>
-                <?php echo $this->formTextArea($form->get('introText')); ?>
-                <?php echo $this->formElementErrors($form->get('introText')); ?>
+    <div class="row mb-2" id="introText">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="form-group mb-2 mt-2">
+                <?php
+                $introText = $fieldset->get('introText');
+                ?>
+                <?php echo $this->formLabel($introText); ?>
+                <?php echo $this->formTextArea($introText); ?>
+                <?php echo $this->formElementErrors($introText); ?>
             </div>
         </div>
     </div>
-    <div class="row" id="required">
-        <div class="col">
-            <div class="form-group">
-                <?php echo $this->formLabel($form->get('required')); ?>
+<?php
+$required = $fieldset->get('required');
+?>
+    <div class="row mb-2" id="required">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <?php echo $this->formLabel($required); ?>
+            <div class="input-group mb-2 mt-2">
                 <label class="switch">
-                    <?php echo $this->formCheckbox($form->get('required')); ?>
+                    <?php echo $this->formCheckbox($required); ?>
                     <span class="slider round"></span>
                 </label>
-                <?php echo $this->formElementErrors($form->get('required')); ?>
+                <?php echo $this->formElementErrors($required); ?>
             </div>
         </div>
     </div>
-
-
-    <div class="row" id="requiredMessage">
-        <div class="col">
+    <div class="row mb-2" id="requiredMessage">
+        <div class="col-sm-12 col-md-12 col-xl-12">
             <div class="form-group">
-                <?php echo $this->formLabel($form->get('requiredMessage')); ?>
-                <?php echo $this->formText($form->get('requiredMessage')); ?>
-                <?php echo $this->formElementErrors($form->get('requiredMessage')); ?>
+                <?php
+                $requiredMessage = $fieldset->get('requiredMessage');
+                ?>
+                <?php echo $this->formLabel($requiredMessage); ?>
+                <?php echo $this->formText($requiredMessage); ?>
+                <?php echo $this->formElementErrors($requiredMessage); ?>
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-2">
         <div class="col">
             <div class="form-group">
-                <?php echo $this->formLabel($form->get('checklistFieldType')); ?>
+                <?php
+                $checklistFieldType = $fieldset->get('checklistFieldType');
+                ?>
+                <?php echo $this->formLabel($checklistFieldType); ?>
                 <?php
                 if(is_object($checkListField)) {
-                    echo $this->formSelect($form->get('checklistFieldType')->setAttributes(['disabled' => 'disabled']));
+                    echo $this->formSelect($checklistFieldType->setAttributes(['disabled' => 'disabled']));
                 } else {
-                    echo $this->formSelect($form->get('checklistFieldType'));
+                    echo $this->formElement($checklistFieldType);
                 }
 
                  ?>
-                <?php echo $this->formElementErrors($form->get('checklistFieldType')); ?>
+                <?php echo $this->formElementErrors($checklistFieldType); ?>
             </div>
         </div>
     </div>
 <?php
 echo $this->partial('partial/checklist-fields-type-options.phtml');
 ?>
-    <div class="row">
+    <div class="row mb-2">
         <div class="col">
             <div class="form-group">
-                <?php echo $this->formLabel($form->get('parent')); ?>
+                <?php
+                $parent = $fieldset->get('parent');
+                ?>
+
+                <?php echo $this->formLabel($parent); ?>
                 <select name="parent" class="form-control">
                     <option value="">--Maak uw keuze--</option>
                     <?php foreach ($checkListFields AS $parentCheckListField) { ?>
@@ -83,7 +107,7 @@ echo $this->partial('partial/checklist-fields-type-options.phtml');
                             value="<?= $parentCheckListField->getId(); ?>"><?= $parentCheckListField->getName(); ?></option>
                     <?php } ?>
                 </select>
-                <?php echo $this->formElementErrors($form->get('parent')); ?>
+                <?php echo $this->formElementErrors($parent); ?>
             </div>
         </div>
     </div>

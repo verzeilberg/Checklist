@@ -6,7 +6,8 @@ use CheckList\Entity\CheckListField;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 
-class checkListFieldService implements checkListFieldServiceInterface {
+class checkListFieldService
+{
 
     protected $em;
 
@@ -69,23 +70,6 @@ class checkListFieldService implements checkListFieldServiceInterface {
 
     /**
      *
-     * Create form of an object
-     *
-     * @param       checklistitem $checklistfield object
-     * @return      form
-     *
-     */
-    public function createCheckListFieldForm($checklistfield) {
-        $builder = new AnnotationBuilder($this->em);
-        $form = $builder->createForm($checklistfield);
-        $form->setHydrator(new DoctrineHydrator($this->em, 'CheckList\Entity\CheckListField'));
-        $form->bind($checklistfield);
-
-        return $form;
-    }
-
-    /**
-     *
      * Set data to new checklistitem
      *
      * @param       checklistitem $checklistfield object
@@ -100,8 +84,6 @@ class checkListFieldService implements checkListFieldServiceInterface {
         $checklistfield->setCreatedBy($currentUser);
         $checklistfield->setChecklist($checklist);
 
-
-
         $this->storeCheckListField($checklistfield);
     }
 
@@ -115,7 +97,7 @@ class checkListFieldService implements checkListFieldServiceInterface {
      */
     public function storeCheckListField($checklistfield) {
         $this->em->persist($checklistfield);
-        $this->em->flush();
+        $this->em->flush($checklistfield);
     }
 
     /**

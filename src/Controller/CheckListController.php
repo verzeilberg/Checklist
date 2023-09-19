@@ -2,10 +2,18 @@
 
 namespace CheckList\Controller;
 
+use Blog\Entity\Blog;
+use Blog\Form\CreateBlogForm;
+use CheckList\Entity\CheckList;
+use CheckList\Form\CreateChecklistAnswerForm;
+use CheckList\Form\CreateChecklistFieldForm;
+use CheckList\Form\CreateChecklistForm;
+use CheckList\Form\CreateChecklistItemForm;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Authentication\Result;
 use Laminas\Uri\Uri;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * This controller is responsible for letting the user to log in and log out.
@@ -51,16 +59,18 @@ class CheckListController extends AbstractActionController {
      * @return Array()    
      */
     public function indexAction() {
-
         $this->layout('layout/beheer');
-        $checkLists = $this->checkListService->getChecklists();
+        $page = $this->params()->fromQuery('page', 1);
+        $query = $this->checkListService->getChecklists();
+
+        $checkLists = $this->checkListService->getItemsForPagination($query, $page, 10);
+
         return new ViewModel([
             'checkLists' => $checkLists
         ]);
     }
 
     /**
-     * 
      * Action to show all deleted (archived) checklists
      */
     public function archiveAction() {
@@ -78,7 +88,10 @@ class CheckListController extends AbstractActionController {
     public function addAction() {
         $this->layout('layout/beheer');
         $checkList = $this->checkListService->createCheckList();
-        $form = $this->checkListService->createCheckListForm($checkList);
+        // Create the form and inject the EntityManager
+        $form = new CreateChecklistForm($this->entityManager);
+        // Create a new, empty entity and bind it to the form
+        $form->bind($checkList);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->getRequest()->getPost());
@@ -107,7 +120,10 @@ class CheckListController extends AbstractActionController {
         if (empty($checklist)) {
             return $this->redirect()->toRoute('beheer/checklist');
         }
-        $form = $this->checkListService->createCheckListForm($checklist);
+        // Create the form and inject the EntityManager
+        $form = new CreateChecklistForm($this->entityManager);
+        // Create a new, empty entity and bind it to the form
+        $form->bind($checklist);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->getRequest()->getPost());
@@ -126,6 +142,7 @@ class CheckListController extends AbstractActionController {
     public function showAction() {
         $this->layout('layout/beheer');
         $this->viewhelpermanager->get('headScript')->appendFile('/js/underscore-1.9.1.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/show-checklist.js');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -137,9 +154,12 @@ class CheckListController extends AbstractActionController {
         }
 
         $checkListFields = $checklist->getCheckListFields();
-
         $checkListItem = $this->checkListItemService->createCheckListItem();
-        $form = $this->checkListItemService->createCheckListItemForm($checkListItem);
+        // Create the form and inject the EntityManager
+        $form = new CreateChecklistItemForm($this->entityManager);
+        // Create a new, empty entity and bind it to the form
+        $form->bind($checkListItem);
+
         $givenAnswers = $this->givenAnswerService->getGivenAnswersByChecklistId($checklist->getId());
 
         return new ViewModel([
@@ -204,16 +224,19 @@ class CheckListController extends AbstractActionController {
 
     public function addFieldAction() {
         $this->layout('layout/beheer');
-        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
+
         $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/checklist.css');
-        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/bootstrap-iconpicker/bootstrap-iconpicker.min.css');
-        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootstrap-iconpicker/bootstrap-iconpicker.bundle.min.js');
-        //Nested sortable
-        $this->viewhelpermanager->get('headScript')->appendFile('//code.jquery.com/ui/1.10.4/jquery-ui.min.js');
         $this->viewhelpermanager->get('headLink')->appendStylesheet('//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
+
+        $this->viewhelpermanager->get('headScript')->appendFile('https://code.jquery.com/ui/1.10.4/jquery-ui.min.js');
+
         $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery.ui.nestedSortable.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
 
         $this->viewhelpermanager->get('headScript')->appendFile('/js/options.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/add-answer.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/answers-library.js');
+
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -225,14 +248,20 @@ class CheckListController extends AbstractActionController {
         }
 
         $checkListField = $this->checkListFieldService->createChecklistField();
-        $form = $this->checkListFieldService->createCheckListFieldForm($checkListField);
+        $form = new CreateChecklistFieldForm($this->entityManager);
+        $form->bind($checkListField);
+
         $answer = $this->checkListAnswerService->createAnswer();
-        $formAnswer = $this->checkListAnswerService->createAnswerForm($answer);
+        $formAnswer = new CreateChecklistAnswerForm($this->entityManager);
+        $formAnswer->bind($answer);
 
         if ($this->getRequest()->isPost()) {
+
+
             $form->setData($this->getRequest()->getPost());
 
             if ($form->isValid()) {
+
                 //Save Checklist
                 $this->checkListFieldService->setNewCheckListField($checkListField, $checklist, $this->currentUser());
                 $this->flashMessenger()->addSuccessMessage('CheckListField opgeslagen');
@@ -257,17 +286,17 @@ class CheckListController extends AbstractActionController {
 
     public function editFieldAction() {
         $this->layout('layout/beheer');
-        //$this->viewhelpermanager->get('headScript')->appendFile('/js/options.js');
-        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
         $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/checklist.css');
-        $this->viewhelpermanager->get('headLink')->appendStylesheet('/css/bootstrap-iconpicker/bootstrap-iconpicker.min.css');
-        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootstrap-iconpicker/bootstrap-iconpicker.bundle.min.js');
-        //Nested sortable
-        $this->viewhelpermanager->get('headScript')->appendFile('//code.jquery.com/ui/1.10.4/jquery-ui.min.js');
         $this->viewhelpermanager->get('headLink')->appendStylesheet('//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
+
+        $this->viewhelpermanager->get('headScript')->appendFile('https://code.jquery.com/ui/1.10.4/jquery-ui.min.js');
+
         $this->viewhelpermanager->get('headScript')->appendFile('/js/jquery.ui.nestedSortable.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/bootbox-4.4.0.min.js');
 
         $this->viewhelpermanager->get('headScript')->appendFile('/js/options.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/add-answer.js');
+        $this->viewhelpermanager->get('headScript')->appendFile('/js/answers-library.js');
 
         $id = (int) $this->params()->fromRoute('id', 0);
         if (empty($id)) {
@@ -277,10 +306,15 @@ class CheckListController extends AbstractActionController {
         if (empty($checkListField)) {
             return $this->redirect()->toRoute('beheer/checklist');
         }
+
         $checkList = $checkListField->getChecklist();
-        $form = $this->checkListFieldService->createCheckListFieldForm($checkListField);
+
+        $form = new CreateChecklistFieldForm($this->entityManager);
+        $form->bind($checkListField);
+
         $answer = $this->checkListAnswerService->createAnswer();
-        $formAnswer = $this->checkListAnswerService->createAnswerForm($answer);
+        $formAnswer = new CreateChecklistAnswerForm($this->entityManager);
+        $formAnswer->bind($answer);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->getRequest()->getPost());

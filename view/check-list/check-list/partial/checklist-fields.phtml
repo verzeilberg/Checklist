@@ -1,14 +1,17 @@
 <!-- Second Page Header -->
-<div class="row">
-    <h1 class="col">FIELDS</h1>
-
+<div class="row g-4">
+    <div class="col-sm-12 col-md-12 col-xl-12">
+        <div class="bg-secondary rounded p-4">
+            <h2 class="mb-4">Fields</h2>
+        </div>
+    </div>
 </div>
-<div class="row">
-    <div class="col">
-        <hr/>
+<div class="row g-4">
+    <div class="col-sm-12 col-md-12 col-xl-12">
+        <div class="bg-secondary rounded p-4">
         <?php
         $this->checkListHelper()->generateCheckListFields($checklist->getCheckListFields(), $this);
         ?>
-        <hr/>
+        </div>
     </div>
 </div>

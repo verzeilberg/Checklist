@@ -26,44 +26,18 @@ class CheckList extends UnityOfWork {
 
     /**
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     * @Annotation\Options({
-     * "label": "Naam",
-     * "label_attributes": {"class": ""}
-     * })
-     * @Annotation\Attributes({"class":"form-control", "placeholder":"Naam"})
      */
     protected $name;
 
     /**
      * @ORM\Column(name="public", type="integer", length=1, nullable=false)
-     * @Annotation\Type("Laminas\Form\Element\Radio")
-     * @Annotation\Options({
-     * "label": "Type lijst",
-     * "value_options":{
-     * "1":"Publiek",
-     * "2":"Persoonlijk",
-     * },
-     * "label_attributes": {"class": "form-check-label"}
-     * })
-     * @Annotation\Attributes({"class":"form-check-input"})
      */
-    protected $public;
+    protected int $public = 2;
 
     /**
      * @ORM\Column(name="autocomplete", type="integer", length=1, nullable=false)
-     * @Annotation\Type("Laminas\Form\Element\Radio")
-     * @Annotation\Options({
-     * "label": "Autocomplete",
-     * "empty_option": "---",
-     * "value_options":{
-     * "1":"Nee",
-     * "2":"Ja",
-     * },
-     * "label_attributes": {"class": "form-check-label"}
-     * })
-     * @Annotation\Attributes({"class":"form-check-input"})
      */
-    protected $autocomplete = 1;
+    protected int $autocomplete = 1;
 
     /**
      * One Checklist has Many CheckList items.

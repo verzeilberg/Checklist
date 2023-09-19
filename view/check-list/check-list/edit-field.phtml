@@ -1,37 +1,36 @@
-<?php
-$this->headTitle('Add Checklist');
-$this->mainMenu()->setActiveItemId('checklistbeheer');
-$this->pageBreadcrumbs()->setLayout('beheer');
-$this->pageBreadcrumbs()->setItems([
-    'Beheer' => $this->url('beheer'),
-    'CheckList' => $this->url('beheer/checklist'),
-    'Edit CheckList field' => $this->url('beheer/checklist', ['action' => 'edit-field', 'id' => $checklist->getId()])
-]);
-$form->setAttributes(array(
-    'class' => 'form-horizontal',
-    'enctype' => 'multipart/form-data'
-));
-?>
-<!-- Page Header -->
-<div class="row">
-    <h1 class="col">CHECKLIST: <?php echo $checklist->getName(); ?></h1>
-</div>
-<!-- Breadcrumbs -->
-<div class="row">
-    <div class="col">
-        <?= $this->pageBreadcrumbs()->render(); ?>
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                <h2 class="mb-4">CHECKLIST: <?php echo $checklist->getName(); ?></h2>
+                <?= $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist]) ?>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                <h2 class="mb-4">Checklist fields</h2>
+                <?php
+                echo $this->partial('partial/add-checklist-field-form.phtml', [
+                    'form' => $form,
+                    'checklist' => $checklist,
+                    'checkListField' => $checkListField,
+                    'checkListFields' => $checkListFields
+                ]);
+                ?>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                <?php
+                echo $this->partial('partial/answers-library.phtml',
+                    ['answers' => $answers, 'formAnswer' => $formAnswer, 'searchLinks' => $searchLinks]);
+                ?>
+            </div>
+        </div>
     </div>
 </div>
-<?php
-echo $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist]);
-?>
-<!-- Page Header -->
-<div class="row">
-    <h1 class="col">CHECKLIST FIELDS</h1>
-</div>
-<?php
-echo $this->partial('partial/add-checklist-field-form.phtml', ['form'=>$form,'checklist' => $checklist, 'checkListField' => $checkListField, 'checkListFields' => $checkListFields]);
-?>
-<?php
-echo $this->partial('partial/answers-library.phtml', ['answers' => $answers, 'formAnswer' => $formAnswer, 'searchLinks' => $searchLinks]);
-?>

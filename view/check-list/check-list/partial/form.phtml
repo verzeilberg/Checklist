@@ -1,0 +1,35 @@
+<?php
+$fieldset = $form->get('checklist');
+?>
+<?php $name = $fieldset->get('name'); ?>
+<div class="row mb-2">
+    <div class="col-sm-12 col-md-12 col-xl-12">
+        <?= $this->formLabel($name) ?>
+        <div class="input-group mb-2 mt-2">
+            <?= $this->formElement($name) ?>
+        </div>
+        <div class="input-group mb-2 mt-2">
+            <small class="form-text text-danger"> <?= $this->formElementErrors()->render($name) ?></small>
+        </div>
+    </div>
+</div>
+<?php $public = $fieldset->get('public'); ?>
+<div class="row mb-2">
+    <div class="col-sm-12 col-md-12 col-xl-12">
+        <?php $this->renderRadioFormElements()->setElement($public); ?>
+        <?= $this->renderRadioFormElements()->render() ?>
+    </div>
+    <div class="input-group mb-2 mt-2">
+        <small class="form-text text-danger"> <?= $this->formElementErrors()->render($public) ?></small>
+    </div>
+</div>
+<?php $autocomplete = $fieldset->get('autocomplete'); ?>
+<div class="row mb-2">
+    <div class="col-sm-12 col-md-12 col-xl-12">
+        <?php $this->renderRadioFormElements()->setElement($autocomplete); ?>
+        <?= $this->renderRadioFormElements()->render() ?>
+    </div>
+    <div class="input-group mb-2 mt-2">
+        <small class="form-text text-danger"> <?= $this->formElementErrors()->render($autocomplete) ?></small>
+    </div>
+</div>

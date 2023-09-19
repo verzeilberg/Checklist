@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Laminas\Form\Annotation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Application\Model\UnityOfWork;
+use Symfony\Component\VarDumper\VarDumper;
+use function is_object;
 
 /**
  * CheckList
@@ -105,7 +107,7 @@ class CheckListField extends UnityOfWork
 
     /**
      * Many checklistfields have One ChecklistFieldType.
-     * @ORM\ManyToOne(targetEntity="CheckListFieldType", inversedBy="checkListFields")
+     * @ORM\ManyToOne(targetEntity="CheckListFieldType", inversedBy="checkListFields", cascade={"persist"}))
      * @ORM\JoinColumn(name="check_list_field_type_id", referencedColumnName="id")
      * @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
      * @Annotation\Options({
@@ -127,7 +129,7 @@ class CheckListField extends UnityOfWork
 
     /**
      * Many Users have Many Groups.
-     * @ORM\ManyToMany(targetEntity="Answer")
+     * @ORM\ManyToMany(targetEntity="Answer", cascade={"persist"})
      * @Annotation\Type("DoctrineModule\Form\Element\ObjectMultiCheckbox")
      * @ORM\JoinTable(name="checklistfield_answer",
      *      joinColumns={@ORM\JoinColumn(name="checklistfield_id", referencedColumnName="id")},
@@ -139,33 +141,19 @@ class CheckListField extends UnityOfWork
 
     /**
      * One CheckListField has Many CheckListFields.
-     * @ORM\OneToMany(targetEntity="CheckListField", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="CheckListField", mappedBy="parent", cascade={"persist"})
      * @ORM\OrderBy({"order" = "ASC"})
      */
     private $children;
 
     /**
      * Many CheckListFields have One CheckListField.
-     * @ORM\ManyToOne(targetEntity="CheckListField", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="CheckListField", inversedBy="children", cascade={"persist"})
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
-     * @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
-     * @Annotation\Required(false)
-     * @Annotation\AllowEmpty
-     * @Annotation\Options({
-     * "target_class":"CheckList\Entity\CheckListField",
-     * "property": "name",
-     * "empty_option": "--Maak uw keuze--",
-     * "label": "Parent",
-     * "label_attributes": {},
-     * "find_method":{"name": "findBy","params": {
-     *     "criteria":{"dateDeleted": null},
-     *     "orderBy":{"name": "ASC"}
-     *     }
-     *  }
-     * })
-     * @Annotation\Attributes({"class": "form-control"})
      */
     private $parent;
+
+
 
     public function __construct()
     {
@@ -375,7 +363,9 @@ class CheckListField extends UnityOfWork
      */
     public function setParent($parent)
     {
-        $this->parent = $parent;
+        if (is_object($parent) && $parent->getName() !== null) {
+            $this->parent = $parent;
+        }
     }
 
     /**

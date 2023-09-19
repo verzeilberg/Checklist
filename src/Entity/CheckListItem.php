@@ -54,7 +54,7 @@ class CheckListItem extends UnityOfWork {
     }
 
     function getItemContent() {
-        return json_decode($this->itemContent, 1);
+        return json_decode($this->itemContent??'', 1);
     }
 
     function setItemContent($itemContent) {

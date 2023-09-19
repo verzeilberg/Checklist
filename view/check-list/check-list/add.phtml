@@ -1,55 +1,30 @@
-<?php
-$this->headTitle('Add Checklist');
-$this->mainMenu()->setActiveItemId('checklistbeheer');
-$this->pageBreadcrumbs()->setLayout('beheer');
-$this->pageBreadcrumbs()->setItems([
-    'Beheer' => $this->url('beheer'),
-    'CheckList' => $this->url('beheer/checklist'),
-    'Add CheckList' => $this->url('beheer/checklist', ['action' => 'add'])
-]);
-$form->setAttributes(array(
-    'class' => 'form-horizontal',
-    'enctype' => 'multipart/form-data'
-));
-?>
-    <!-- Page Header -->
-    <div class="row">
-        <h1 class="col">ADD CHECKLIST</h1>
-    </div>
-    <!-- Breadcrumbs -->
-    <div class="row">
-        <div class="col">
-            <?= $this->pageBreadcrumbs()->render(); ?>
+<div class="container-fluid pt-4 px-4">
+    <?php $form->prepare(); ?>
+    <?= $this->form()->openTag($form); ?>
+    <?= $this->formRow($form->get('csrf')); ?>
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                <h2 class="mb-4">Add checklist</h2>
+                <!-- Checklist form -->
+                <?= $this->partial('partial/form.phtml', array('form' => $form)); ?>
+                <!-- End Checklist form -->
+            </div>
         </div>
-    </div>
-<?php echo $this->form()->openTag($form); ?>
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <?php echo $this->formLabel($form->get('name')); ?>
-                <?php echo $this->formText($form->get('name')); ?>
-                <?php echo $this->formElementErrors($form->get('name')); ?>
-            </div>
-            <?php
-            $this->checkListHelper()->createFormRadioInputs($form->get('public'));
-            ?>
-            <div class="col-sm-5 col-md-5 col-lg-5">
-                <?php echo $this->formElementErrors($form->get('public')); ?>
-            </div>
-            <?php
-            $this->checkListHelper()->createFormRadioInputs($form->get('autocomplete'));
-            ?>
-            <div class="col-sm-5 col-md-5 col-lg-5">
-                <?php echo $this->formElementErrors($form->get('autocomplete')); ?>
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-xl-6">
+                        <?= $this->formRow($form->get('submit')); ?>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-xl-6 text-end">
+                        <a href="<?= $this->url('beheer/checklist', ['action' => 'index']) ?>" class="btn btn-primary"
+                           title="Annuleren">Annuleren</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <button type="submit" id="submit" class="btn btn-dark">Opslaan</button>
-        </div>
-        <div class="col text-right">
-            <a href="<?php echo $this->url('beheer/checklist'); ?>" class="btn btn-dark" title="Annuleren">Annuleren</a>
-        </div>
-    </div>
-<?php echo $this->form()->closeTag($form); ?>
+    <?= $this->form()->closeTag($form); ?>
+</div>
+

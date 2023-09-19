@@ -6,7 +6,7 @@ use CheckList\Entity\Answer;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 
-class checkListAnswerService implements checkListAnswerServiceInterface
+class checkListAnswerService
 {
 
     protected $em;

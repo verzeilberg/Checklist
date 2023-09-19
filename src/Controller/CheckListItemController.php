@@ -36,7 +36,7 @@ class CheckListItemController extends AbstractActionController {
      */
     public function indexAction() {
         $this->layout('layout/beheer');
-        $checkListsItems = $this->checkListItemService->getChecklistItems();
+        $checkListsItems = $this->checkListService->getChecklists();
         return new ViewModel([
             'checkListsItems' => $checkListsItems
         ]);

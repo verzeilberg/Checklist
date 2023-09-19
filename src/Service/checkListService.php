@@ -2,12 +2,17 @@
 
 namespace CheckList\Service;
 
+use Blog\Entity\Blog;
+use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter;
+use Laminas\Form\Annotation\AnnotationBuilder;
+use Laminas\Paginator\Paginator;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use CheckList\Entity\CheckList;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
-use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 
-class checkListService implements checkListServiceInterface {
+class checkListService
+{
 
     protected $em;
 
@@ -39,8 +44,10 @@ class checkListService implements checkListServiceInterface {
      *
      */
     public function getChecklists() {
-        $checkLists = $this->em->getRepository(CheckList::class)
-                ->findBy(['deleted' => 0], ['dateCreated' => 'DESC']);
+        $qb = $this->em->getRepository(CheckList::class)->createQueryBuilder('c')
+            ->where('c.deleted = 0')
+            ->orderBy('c.dateCreated', 'DESC');
+        return $qb->getQuery();
 
         return $checkLists;
     }
@@ -222,6 +229,21 @@ class checkListService implements checkListServiceInterface {
     public function deleteChecklist($checklist) {
         $this->em->remove($checklist);
         $this->em->flush();
+    }
+
+    /**
+     * @param $query
+     * @param int $currentPage
+     * @param int $itemsPerPage
+     * @return Paginator
+     */
+    public function getItemsForPagination($query, $currentPage = 1, $itemsPerPage = 10)
+    {
+        $adapter = new DoctrineAdapter(new ORMPaginator($query, false));
+        $paginator = new Paginator($adapter);
+        $paginator->setDefaultItemCountPerPage($itemsPerPage);
+        $paginator->setCurrentPageNumber($currentPage);
+        return $paginator;
     }
 
 }

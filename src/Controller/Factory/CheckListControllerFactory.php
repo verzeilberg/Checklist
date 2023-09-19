@@ -25,7 +25,7 @@ class CheckListControllerFactory implements FactoryInterface
         $checkListItemService = new checkListItemService($entityManager);
         $checkListFieldService = new checkListFieldService($entityManager);
         $checkListAnswerService = new checkListAnswerService($entityManager);
-        $givenAnswerService = new givenAnswerService($entityManager, $checkListFieldService);
+        $givenAnswerService = new givenAnswerService($entityManager, $checkListFieldService, $checkListAnswerService);
         
         return new CheckListController(
             $entityManager,

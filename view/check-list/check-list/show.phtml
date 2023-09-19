@@ -1,22 +1,7 @@
-<?php
-$this->headTitle('Show Checklist');
-$this->mainMenu()->setActiveItemId('checklistbeheer');
-$this->pageBreadcrumbs()->setLayout('beheer');
-$this->pageBreadcrumbs()->setItems([
-    'Beheer' => $this->url('beheer'),
-    'CheckList' => $this->url('beheer/checklist'),
-    'Show CheckList' => $this->url('beheer/checklist', ['action' => 'show'])
-]);
-?>
+
 <!-- Page Header -->
 <div class="row">
     <h1 class="col">ITEMS FOR <?php echo $checklist->getName(); ?></h1>
-</div>
-<!-- Breadcrumbs -->
-<div class="row">
-    <div class="col">
-        <?= $this->pageBreadcrumbs()->render(); ?>
-    </div>
 </div>
 <!-- Page header options -->
 <div class="row mb-3">
@@ -141,82 +126,3 @@ echo $this->partial('check-list/partial/export-file.phtml', array('checklist' =>
 echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
 ?>
 <!-- End checklist item -->
-<script>
-    $(document).ready(function () {
-        $('#checkAll').change(function (e) {
-            if ($(this).is(":checked")) {
-                $("input.delete-item").each(function (i) {
-                    $(this).prop('checked', true);
-                });
-            } else {
-                $("input.delete-item").each(function () {
-                    $(this).prop('checked', false);
-                });
-            }
-        });
-
-        /*
-         * Click funtion to remove selected items
-         */
-        $('#remove').click(function (e) {
-            e.preventDefault();
-            var itemsToDelete = []
-            $("input.delete-item").each(function (i) {
-                if ($(this).is(":checked")) {
-                    itemsToDelete.push($(this).val());
-                }
-            });
-            if (itemsToDelete.length > 0) {
-                var form_data = new FormData();
-                form_data.append('itemsToDelete', itemsToDelete);
-                $.ajax({
-                    url: '<?php echo $this->url('checklistajax', ['action' => 'delete-items']); ?>',
-                    dataType: 'json',
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    async: true,
-                    type: 'post',
-                    success: function (response) {
-                        if (response.error === false) {
-                            $(response.deletedItems).each(function (index, value) {
-                                $('tr#checklistItem-' + value).slideUp("slow", function () {
-                                    // Animation complete.
-                                });
-                            });
-                            $('#checkAll').prop('checked', false);
-                        } else {
-                            alert(response.error_message);
-                        }
-                    }
-                });
-            }
-        });
-
-
-        //Click function to remove checklistitem
-        $(document).on('click', '.removeChecklistItemOpen', function () {
-            var id = $(this).data('checklistitemid');
-            $.ajax({
-                url: '<?php echo $this->url('checklistajax', ['action' => 'delete-item']); ?>',
-                dataType: 'json',
-                data: {
-                    id: id
-                },
-                async: true,
-                type: 'post',
-                success: function (response) {
-                    if (response.success == true) {
-                        $('tr#checklistItem-' + response.checklistItemId).fadeOut('fast',
-                            function () {
-                            });
-
-                    } else {
-                        alert(response.errorMessage);
-                    }
-                }
-            });
-        });
-    });
-</script>

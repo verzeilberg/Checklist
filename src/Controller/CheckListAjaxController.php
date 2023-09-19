@@ -5,6 +5,7 @@ namespace CheckList\Controller;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\Authentication\Result;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * This controller is responsible for letting the user to log in and log out.
@@ -427,9 +428,14 @@ class CheckListAjaxController extends AbstractActionController
 
     }
 
-    private function saveChecklists($checkListFields, $parentCheckListField = null) {
+    /**
+     * @param $checkListFields
+     * @param $parentCheckListField
+     * @return void
+     */
+    private function saveChecklists($checkListFields, $parentCheckListField = null): void
+    {
         foreach($checkListFields AS $index => $checkListFieldId) {
-
             $sortOrder = $index + 1;
             $checkListField = $this->checkListFieldService->getCheckListFieldById($checkListFieldId['id']);
             $checkListField->setOrder($sortOrder);
@@ -441,12 +447,9 @@ class CheckListAjaxController extends AbstractActionController
 
             $this->checkListFieldService->storeCheckListField($checkListField);
 
-            if (count($checkListFieldId["children"]) > 0) {
+            if (count($checkListFieldId["children"]??[]) > 0) {
                 $this->saveChecklists($checkListFieldId["children"], $checkListField);
             }
-
-
-
         }
     }
 

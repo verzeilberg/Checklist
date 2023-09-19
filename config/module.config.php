@@ -58,10 +58,6 @@ return [
     ],
     'service_manager' => [
         'invokables' => [
-            CheckList\checkListServiceInterface::class => Service\checkListService::class,
-            CheckList\checkListFieldServiceInterface::class => Service\checkListFieldService::class,
-            CheckList\checkListAnswerServiceInterface::class => Service\checkListAnswerService::class,
-            CheckList\givenAnswerServiceInterface::class => Service\givenAnswerService::class,
         ],
     ],
     'doctrine' => [

@@ -5,10 +5,7 @@ $(document).ready(function () {
      */
     var options = $('input[name=options]').val();
 
-    /*
-     * Initialize iconpicker
-     */
-     var iconPicker = $('#target').iconpicker();
+    console.log('dasdasda');
 
     /*
      * Check if options is filled otherwise create empty object
@@ -406,7 +403,7 @@ $(document).ready(function () {
                 data: {
                     list: list,
                 },
-                url: "<?php echo $this->url('checklistajax', ['action' => 'orderCheckListFields']); ?>",
+                url: "/checklistajax/orderCheckListFields",
                 async: true,
                 success: function (data) {
                     if (data.success === true) {
@@ -424,11 +421,12 @@ $(document).ready(function () {
      * Check if field is mandatory and show required message
      */
     function checkIfMandatory() {
-        if ($('input[name=required]').is(':checked')) {
+        if ($('input#isRequired').is(':checked')) {
             $('#requiredMessage').show();
         } else {
             $('#requiredMessage').hide();
-            $('input[name=requiredMessage]').val('');
+            console.log('sdsdasdsad');
+            $('input#requiredMessage').val('');
         }
     }
 
@@ -436,11 +434,11 @@ $(document).ready(function () {
      * Check if fieldtype is 13 and show introtext
      */
     function checkIfIntroText() {
-        var fieldType = $('select[name=checklistFieldType]').val();
+        var fieldType = $('select#checklistFieldType').val();
         if (fieldType == 13) {
             $('#introText').show();
             $('#required').hide();
-            $('input[name=required]').prop("checked", false);
+            $('input#isRequired').prop("checked", false);
             checkIfMandatory();
         } else {
             $('#introText').hide();
@@ -468,13 +466,12 @@ $(document).ready(function () {
      * Hide all options field and show the one according to filed type id
      */
     function getOptionsByFieldType() {
-        var selectedValue = $('select[name=checklistFieldType]').val();
+        var selectedValue = $('select#checklistFieldType').val();
         resetOptionFields();
         $('#optionField').hide();
         $('.option').hide();
         $('.options' + selectedValue).show();
         $('#optionField').show();
-
     }
 
 
@@ -495,28 +492,28 @@ $(document).ready(function () {
     function showAnswersOnPageLoad()
     {
         $('div#answers').hide();
-        var selectedValue = $("select[name=checklistFieldType]").val();
+        var selectedValue = $("select#checklistFieldType").val();
         showAnswers(selectedValue);
     }
 
     /*
      * When input with attribute required is changed
      */
-    $('input[name=required]').change(function () {
+    $('input#isRequired').change(function () {
         checkIfMandatory();
     });
 
     /*
      * When input with attribute required is changed
      */
-    $('select[name=checklistFieldType]').change(function () {
+    $('select#checklistFieldType').change(function () {
         checkIfIntroText();
     });
 
     /*
      * When input with attribute required is changed
      */
-    $("select[name=checklistFieldType]").change(function () {
+    $("select#checklistFieldType").change(function () {
         var selectedValue = $(this).val();
         showAnswers(selectedValue);
         getOptionsByFieldType();
