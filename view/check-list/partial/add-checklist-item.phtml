@@ -1,17 +1,15 @@
 <!-- Modal -->
 <?php
-$form->setAttributes(array(
+$form->setAttributes([
 'autocomplete' => ($checklist->getAutocomplete() == 2? "on":"off")
-));
+]);
 ?>
-<div class="modal fade" id="addChecklistItem" tabindex="-1" aria-labelledby="addChecklistItemLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content bg-dark">
+<div class="modal fade" id="addChecklistItem" tabindex="-1" aria-labelledby="categoriesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="addChecklistItemLabel">Add checklist item</h4>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h4 class="modal-title text-primary" id="categoriesLabel">Add checklist item</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <?php echo $this->form()->openTag($form); ?>
             <input type="hidden" name="id" id="checkListItemId" value=""/>
@@ -20,7 +18,7 @@ $form->setAttributes(array(
             </div>
             <div class="modal-footer">
                 <button type="button" id="addChecklistItemButton" class="btn btn-secondary">Opslaan</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
             <?php echo $this->form()->closeTag($form); ?>
         </div>

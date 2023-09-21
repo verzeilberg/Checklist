@@ -6,6 +6,7 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use CheckList\Entity\AnswerGiven;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
+use Symfony\Component\VarDumper\VarDumper;
 
 class givenAnswerService
 {
@@ -49,6 +50,8 @@ class givenAnswerService
         $qb->where('c.id = ' . $checklistId);
         $query = $qb->getQuery();
         $result = $query->getResult();
+
+
 
 
         $data = [];

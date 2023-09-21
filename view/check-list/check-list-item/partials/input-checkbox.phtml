@@ -1,14 +1,22 @@
 <?php
+
+use Symfony\Component\VarDumper\VarDumper;
+
 $value = '';
 if (is_object($checklistitem)) {
     $values = $checklistitem->getItemContent();
     $value = $values[$checkListField->getFormFieldName()];
 }
+
+
+
 ?>
 <div class="form-group">
     <div class="form-check">
         <?php
         foreach ($checkListField->getAnswers() AS $answer) { ?>
+
+            <?php VarDumper::dump($answer); die; ?>
             <br/>
             <input class="form-check-input" <?= ($checkListField->getRequired() == 1 ? 'required' : '') ?>
                         type="<?= $checkListField->getChecklistFieldType()->getFormType(); ?>"

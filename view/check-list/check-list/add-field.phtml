@@ -2,7 +2,7 @@
     <div class="row g-4">
         <div class="col-sm-12 col-md-12 col-xl-12">
             <div class="bg-secondary rounded p-4">
-                <h2 class="mb-4">CHECKLIST: <?php echo $checklist->getName(); ?></h2>
+                <h2 class="text-primary">Checklist: <?php echo $checklist->getName(); ?></h2>
                 <?= $this->partial('partial/checklist-fields.phtml', ['checklist' => $checklist]) ?>
             </div>
         </div>
@@ -10,7 +10,7 @@
     <div class="row g-4">
         <div class="col-sm-12 col-md-12 col-xl-12">
             <div class="bg-secondary rounded p-4">
-                <h2 class="mb-4">Checklist fields</h2>
+                <h2 class="text-primary">Add new checklist field</h2>
                 <?php
                 echo $this->partial('partial/add-checklist-field-form.phtml', [
                     'form' => $form,

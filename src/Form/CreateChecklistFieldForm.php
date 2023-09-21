@@ -8,12 +8,15 @@ use Doctrine\Persistence\ObjectManager;
 use Laminas\Form\Element\Csrf;
 use Laminas\Form\Element\Submit;
 use Laminas\Form\Form;
+use Symfony\Component\VarDumper\VarDumper;
 
 class CreateChecklistFieldForm extends Form
 {
     public function __construct(ObjectManager $objectManager)
     {
         parent::__construct('create-checklist-field-form');
+
+
 
         // The form will hydrate an object of type "Checklist"
         $this->setHydrator(new DoctrineHydrator($objectManager));
@@ -23,7 +26,6 @@ class CreateChecklistFieldForm extends Form
         $checklistFieldFieldset->setUseAsBaseFieldset(true);
         $this->add($checklistFieldFieldset);
 
-        // Add the Submit button
         $this->add([
             'type'  => Submit::class,
             'name' => 'submit',
@@ -34,7 +36,6 @@ class CreateChecklistFieldForm extends Form
             ],
         ]);
 
-        // Add the CSRF field
         $this->add([
             'type' => Csrf::class,
             'name' => 'csrf',
@@ -44,6 +45,5 @@ class CreateChecklistFieldForm extends Form
                 ]
             ],
         ]);
-
     }
 }

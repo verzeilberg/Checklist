@@ -56,6 +56,11 @@ class AnswerGiven extends UnityOfWork {
      */
     protected $answer;
 
+    public function __construct()
+    {
+    }
+
+
     /**
      * @return mixed
      */

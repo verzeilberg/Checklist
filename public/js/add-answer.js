@@ -58,6 +58,8 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success == true) {
 
+                    //checklist-field[answers][]
+
                     var row = $('<tr id="item-' + response.checkListItemId + '">');
                     row.append($('<td class="text-center">').html('<input type="checkbox" name="answers[]"\n' +
                         '                                                           value="' + response.data.id + '"/>'));

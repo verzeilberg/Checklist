@@ -78,12 +78,7 @@ $required = $fieldset->get('required');
                 ?>
                 <?php echo $this->formLabel($checklistFieldType); ?>
                 <?php
-                if(is_object($checkListField)) {
-                    echo $this->formSelect($checklistFieldType->setAttributes(['disabled' => 'disabled']));
-                } else {
                     echo $this->formElement($checklistFieldType);
-                }
-
                  ?>
                 <?php echo $this->formElementErrors($checklistFieldType); ?>
             </div>
@@ -92,34 +87,15 @@ $required = $fieldset->get('required');
 <?php
 echo $this->partial('partial/checklist-fields-type-options.phtml');
 ?>
-    <div class="row mb-2">
-        <div class="col">
-            <div class="form-group">
-                <?php
-                $parent = $fieldset->get('parent');
-                ?>
-
-                <?php echo $this->formLabel($parent); ?>
-                <select name="parent" class="form-control">
-                    <option value="">--Maak uw keuze--</option>
-                    <?php foreach ($checkListFields AS $parentCheckListField) { ?>
-                        <option <?= (is_object($checkListField) && is_object($checkListField->getParent()) && $checkListField->getParent()->getId() == $parentCheckListField->getId() ? 'selected' : '') ?>
-                            value="<?= $parentCheckListField->getId(); ?>"><?= $parentCheckListField->getName(); ?></option>
-                    <?php } ?>
-                </select>
-                <?php echo $this->formElementErrors($parent); ?>
-            </div>
-        </div>
-    </div>
 <?php
-echo $this->partial('partial/answers.phtml', ['answers' => $answers, 'checkListField' => $checkListField]);
+echo $this->partial('partial/answers.phtml', ['answers' => $answers, 'checkListField' => $checkListField, 'fieldset' => $fieldset]);
 ?>
     <div class="row">
         <div class="col">
-            <button type="submit" id="submit" class="btn btn-dark">Opslaan</button>
+            <button type="submit" id="submit" class="btn btn-primary">Opslaan</button>
         </div>
-        <div class="col text-right">
-            <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-dark" title="Annuleren">Annuleren</a>
+        <div class="col text-end">
+            <a href="<?php echo $this->url('beheer/checklist') ?>" class="btn btn-primary" title="Annuleren">Annuleren</a>
         </div>
     </div>
 <?php echo $this->form()->closeTag($form); ?>

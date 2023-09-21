@@ -2,14 +2,18 @@
 
 namespace CheckList\Form;
 
+use CheckList\Entity\Answer;
 use CheckList\Entity\CheckList;
 use CheckList\Entity\CheckListField;
 use CheckList\Entity\CheckListFieldType;
+use CheckList\Form\Element\ParentSelect;
 use Doctrine\Laminas\Hydrator\DoctrineObject as DoctrineHydrator;
 use Doctrine\Persistence\ObjectManager;
+use DoctrineModule\Form\Element\ObjectMultiCheckbox;
 use DoctrineModule\Form\Element\ObjectSelect;
 use Laminas\Form\Element\Checkbox;
 use Laminas\Form\Element\Collection;
+use Laminas\Form\Element\MultiCheckbox;
 use Laminas\Form\Element\Radio;
 use Laminas\Form\Element\Select;
 use Laminas\Form\Element\Text;
@@ -17,6 +21,7 @@ use Laminas\Form\Element\Textarea;
 use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator\NotEmpty;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ChecklistFieldFieldset extends Fieldset implements InputFilterProviderInterface
 {
@@ -115,14 +120,19 @@ class ChecklistFieldFieldset extends Fieldset implements InputFilterProviderInte
             ],
         ]);
 
-        $tagFieldset2 = new ParentFieldset($objectManager);
+
+
         $this->add([
-            'type'    => Collection::class,
-            'name'    => 'parent',
+            'type' => ObjectMultiCheckbox::class,
+            'name' => 'answers',
             'required' => false,
             'options' => [
-                'label' => 'Parent',
-                'target_element' => $tagFieldset2,
+                'object_manager' => $objectManager,
+                'target_class'   => Answer::class,
+                'label' => 'Antwoorden',
+                'label_generator' => function ($targetEntity) {
+                    return $targetEntity->getLabel();
+                },
             ],
         ]);
     }
@@ -133,9 +143,9 @@ class ChecklistFieldFieldset extends Fieldset implements InputFilterProviderInte
             'name' => [
                 'required' => true,
             ],
-            'parent' => [
+            'answers' => [
                 'required' => false,
-            ],
+            ]
         ];
     }
 

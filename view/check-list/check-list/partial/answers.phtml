@@ -11,6 +11,12 @@
                 </div>
             </div>
             <div class="card-body">
+                <div id="selectedAswers"
+                <?php
+                $answers = $fieldset->get('answers');
+                echo $this->formMultiCheckbox($answers);
+                ?>
+                </div>
                 <table id="answersTable" class="table table-dark table-sm table-bordered table-hover table-striped">
                     <thead class="thead-dark">
                     <tr>
@@ -24,11 +30,14 @@
                         <?php foreach ($checkListField->getAnswers() AS $answer) { ?>
                             <tr>
                                 <td>
-                                    <input type="hidden" name="answers[]" value="<?= $answer->getId() ?>" />
                                     <?= $answer->getLabel(); ?>
                                 </td>
                                 <td><?= $answer->getValue() ?></td>
-                                <td class="text-center"><button type="button" class="btn btn-sm btn-danger removeAnswer"><i class="fas fa-trash-alt"></i></button></td>
+                                <td class="text-center">
+                                    <button type="button" data-answerid="<?= $answer->getId() ?>" class="btn btn-sm btn-danger removeAnswer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
                             </tr>
                         <?php } ?>
                     <?php } ?>

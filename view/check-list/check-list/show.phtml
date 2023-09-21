@@ -1,111 +1,119 @@
-
-<!-- Page Header -->
-<div class="row">
-    <h1 class="col">ITEMS FOR <?php echo $checklist->getName(); ?></h1>
-</div>
-<!-- Page header options -->
-<div class="row mb-3">
-    <div class="col">
-        <a class="btn btn-danger" id="remove" href="#">
-            <i class="fas fa-trash-alt"></i> Verwijder geselecteerde items
-        </a>
-        <!--
-        <a class="btn btn-secondary" href="
-       <?= $this->url('beheer/checklistitem', ['action' => 'add', 'id' => $checklist->getId()]); ?>">
-            <i class="fas fa-plus-square"></i> Nieuwe checklist item
-        </a>-->
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-secondary" id="addChecklistItemOpen">
-            <i class="fas fa-plus-square"></i> Nieuwe checklist item
-        </button>
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exportFile">
-            <i class="fas fa-upload"></i> Exporteer items
-        </button>
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#importFile">
-            <i class="fas fa-upload"></i> Importeer items
-        </button>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <table id="myTable" class="table table-dark table-sm table-bordered table-hover table-striped">
-            <thead class="thead-dark">
-            <tr>
-                <th class="text-center sorter-false"><input type="checkbox" id="checkAll" name="checkAll" value="1"/>
-                </th>
-                <?php foreach ($checklist->getCheckListFieldsForOverview() as $fields) { ?>
-                    <?php if ($fields->getChecklistFieldType()->getFormType() == 'fieldset  ') {
-                      continue;
-                    } ?>
-
-                    <th data-checklistfield="<?= $fields->getId(); ?>"
-                        class="checklistFieldHeader"><?php echo $fields->getName(); ?></th>
-                <?php } ?>
-                <th class="text-center"><i class="fas fa-cogs"></i></th>
-            </tr>
-            </thead>
-            <tbody id="result">
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded  p-4">
+                <div class="row g-4">
+                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4">ITEMS FOR <?php echo $checklist->getName(); ?></h2>
+                </div>
 
 
-            <?php if (count($checklist->getCheckListItems()) > 0) { ?>
-                <?php foreach ($checklist->getCheckListItems() AS $item) { ?>
+                <!-- Page header options -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <a class="btn btn-square btn-danger" id="remove" href="#">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                        <input type="hidden" name="checklistId" value="<?= $checklist->getId() ?>" />
+                        <!-- Button trigger modal add checklist item -->
+                        <button type="button" class="btn btn-square btn-success" id="addChecklistItemOpen">
+                            <i class="fas fa-plus-square"></i>
+                        </button>
+                        <!-- Button trigger modal export -->
+                        <button type="button" class="btn btn-square btn-light" data-bs-toggle="modal" data-bs-target="#exportModal">
+                            <i class="fas fa-upload"></i>
+                        </button>
+                        <!-- Button trigger modal import -->
+                        <button type="button" class="btn btn-square btn-primary" data-bs-toggle="modal" data-bs-target="#importFile">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <table id="myTable" class="table table-dark table-sm table-bordered table-hover table-striped">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th class="text-center sorter-false"><input type="checkbox" id="checkAll"
+                                                                            name="checkAll"
+                                                                            value="1"/>
+                                </th>
+                                <?php foreach ($checklist->getCheckListFieldsForOverview() as $fields) { ?>
+                                    <?php if ($fields->getChecklistFieldType()->getFormType() == 'fieldset  ') {
+                                        continue;
+                                    } ?>
 
-                    <?php
-                    $givenAnswersForCheckListItem = $givenAnswers[$item->getId()];
-                    ?>
+                                    <th data-checklistfield="<?= $fields->getId(); ?>"
+                                        class="checklistFieldHeader"><?php echo $fields->getName(); ?></th>
+                                <?php } ?>
+                                <th class="text-center"><i class="fas fa-cogs"></i></th>
+                            </tr>
+                            </thead>
+                            <tbody id="result">
 
 
-                    <tr id="checklistItem-<?php echo $item->getId(); ?>">
-                        <td class="text-center"><input class="delete-item" type="checkbox" name="checked-items[]"
-                                                       value="<?php echo $item->getId(); ?>"/></td>
-                        <?php foreach ($checklist->getCheckListFieldsForOverview() as $fields) { ?>
-                            <?php if ($fields->getChecklistFieldType()->getFormType() == 'fieldset') {
-                                continue;
-                            } ?>
-                            <td data-checklistfield="<?= $fields->getId(); ?>" class="checklistField"
-                                id="checkListField-<?= $fields->getId(); ?>">
-                                <?php
-                                if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
-                                    foreach ($givenAnswersForCheckListItem[$fields->getId()] AS $answer) {
-                                        echo '<i class="fas fa-check-square"></i> ' . $answer . '<br/>';
-                                    }
-                                } elseif ($fields->getChecklistFieldType()->getFormType() == 'radio') {
-                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
-                                        echo '<i class="fas fa-check-circle"></i> ' . current($givenAnswersForCheckListItem[$fields->getId()]);
-                                    }
-                                } elseif ($fields->getChecklistFieldType()->getFormType() == 'select') {
-                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
-                                        echo current($givenAnswersForCheckListItem[$fields->getId()]);
-                                    }
-                                } else {
-                                    echo current($givenAnswersForCheckListItem[$fields->getId()]);
-                                }
-                                ?>
-                            </td>
-                        <?php } ?>
-                        <td class="text-center">
-                            <button data-checklistitemid="<?= $item->getId(); ?>"
-                                    class="btn btn-sm btn-secondary editChecklistItemOpen">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button data-checklistitemid="<?= $item->getId(); ?>"
-                                    class="btn btn-sm btn-danger removeChecklistItemOpen ">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                <?php } ?>
-            <?php } else { ?>
-                <tr class="noCheclistItems">
-                    <td class="text-center" colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">
-                        Er zijn nog geen checklist items.
-                    </td>
-                </tr>
-            <?php } ?>
-            </tbody>
-        </table>
+                            <?php if (count($checklist->getCheckListItems()) > 0) { ?>
+                                <?php foreach ($checklist->getCheckListItems() as $item) { ?>
+
+                                    <?php
+                                    $givenAnswersForCheckListItem = $givenAnswers[$item->getId()];
+                                    ?>
+
+
+                                    <tr id="checklistItem-<?php echo $item->getId(); ?>">
+                                        <td class="text-center"><input class="delete-item" type="checkbox"
+                                                                       name="checked-items[]"
+                                                                       value="<?php echo $item->getId(); ?>"/></td>
+                                        <?php foreach ($checklist->getCheckListFieldsForOverview() as $fields) { ?>
+                                            <?php if ($fields->getChecklistFieldType()->getFormType() == 'fieldset') {
+                                                continue;
+                                            } ?>
+                                            <td data-checklistfield="<?= $fields->getId(); ?>" class="checklistField"
+                                                id="checkListField-<?= $fields->getId(); ?>">
+                                                <?php
+                                                if ($fields->getChecklistFieldType()->getFormType() == 'checkbox') {
+                                                    foreach ($givenAnswersForCheckListItem[$fields->getId()] as $answer) {
+                                                        echo '<i class="fas fa-check-square"></i> ' . $answer . '<br/>';
+                                                    }
+                                                } elseif ($fields->getChecklistFieldType()->getFormType() == 'radio') {
+                                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
+                                                        echo '<i class="fas fa-check-circle"></i> ' . current($givenAnswersForCheckListItem[$fields->getId()]);
+                                                    }
+                                                } elseif ($fields->getChecklistFieldType()->getFormType() == 'select') {
+                                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
+                                                        echo current($givenAnswersForCheckListItem[$fields->getId()]);
+                                                    }
+                                                } else {
+                                                    echo current($givenAnswersForCheckListItem[$fields->getId()]??[]);
+                                                }
+                                                ?>
+                                            </td>
+                                        <?php } ?>
+                                        <td class="text-center">
+                                            <button data-checklistitemid="<?= $item->getId() ?>"
+                                                    class="btn btn-sm btn-secondary editChecklistItemOpen">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button data-checklistitemid="<?= $item->getId() ?>"
+                                                    class="btn btn-sm btn-danger removeChecklistItemOpen ">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <tr class="noCheclistItems">
+                                    <td class="text-center"
+                                        colspan="<?php echo count($checklist->getCheckListFields()) + 3 ?>">
+                                        Er zijn nog geen checklist items.
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -123,6 +131,7 @@ echo $this->partial('check-list/partial/export-file.phtml', array('checklist' =>
 
 <!-- Add checklist item-->
 <?php
-echo $this->partial('check-list/partial/add-checklist-item.phtml', array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
+echo $this->partial('check-list/partial/add-checklist-item.phtml',
+    array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
 ?>
 <!-- End checklist item -->

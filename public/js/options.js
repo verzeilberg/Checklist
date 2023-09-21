@@ -466,7 +466,13 @@ $(document).ready(function () {
      * Hide all options field and show the one according to filed type id
      */
     function getOptionsByFieldType() {
+
+
+
         var selectedValue = $('select#checklistFieldType').val();
+
+        console.log('This is the value:' + selectedValue);
+
         resetOptionFields();
         $('#optionField').hide();
         $('.option').hide();

@@ -44,13 +44,19 @@ class CheckListHelper extends AbstractHelper
     public function showCheckListFields($checkListFields, $urlHelper)
     {
         foreach ($checkListFields AS $checkListField) {
+
+
+
             echo '<div class="row">';
             echo '<div class="col">';
             echo '<div class="form-group">';
             if ($checkListField->getChecklistFieldType()->getFormType() != 'fieldset') {
-                echo '<label>' . $checkListField->getName() . ($checkListField->getRequired() == 1 ? ' *' : '') . '</label>';
+                echo '<label>' . $checkListField->getName() . ($checkListField->getRequired() === 1 ? ' *' : '') . '</label>';
             }
             $formTypeURL = 'check-list/check-list-item/partials/input-' . $checkListField->getChecklistFieldType()->getFormType() . '.phtml';
+
+
+
             echo $urlHelper->partial($formTypeURL, array('checkListField' => $checkListField, 'urlHelper' => $urlHelper));
             echo '</div>';
             echo '</div>';

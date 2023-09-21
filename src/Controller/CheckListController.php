@@ -267,6 +267,8 @@ class CheckListController extends AbstractActionController {
                 $this->flashMessenger()->addSuccessMessage('CheckListField opgeslagen');
 
                 return $this->redirect()->toRoute('beheer/checklist', array('action' => 'add-field', 'id' => $checklist->getId()));
+            } else {
+                VarDumper::dump($form->getMessages());
             }
         }
 

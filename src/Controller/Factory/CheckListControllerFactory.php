@@ -26,7 +26,9 @@ class CheckListControllerFactory implements FactoryInterface
         $checkListFieldService = new checkListFieldService($entityManager);
         $checkListAnswerService = new checkListAnswerService($entityManager);
         $givenAnswerService = new givenAnswerService($entityManager, $checkListFieldService, $checkListAnswerService);
-        
+
+        $formManager = $container->get('FormElementManager');
+
         return new CheckListController(
             $entityManager,
             $viewhelpermanager,
@@ -34,7 +36,8 @@ class CheckListControllerFactory implements FactoryInterface
             $checkListItemService,
             $checkListFieldService,
             $checkListAnswerService,
-            $givenAnswerService
+            $givenAnswerService,
+            $formManager
         );
         
     }

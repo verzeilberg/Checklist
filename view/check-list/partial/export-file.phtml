@@ -1,13 +1,10 @@
 <!-- Modal -->
-<div class="modal fade" id="exportFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content bg-dark">
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Exporteer items</h4>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h1 class="modal-title fs-5 text-primary" id="exportModalLabel">Exporteer items</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= $this->url('beheer/checklistitem', ['action' => 'export-list']); ?>" method="post">
                 <div class="modal-body">
@@ -23,9 +20,8 @@
                     <input type="hidden" name="id" value="<?= $checklist->getId(); ?>"/>
                 </div>
                 <div class="modal-footer">
-
                     <button type="submit" id="export" class="btn btn-secondary">Export</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>

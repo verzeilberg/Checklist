@@ -181,6 +181,8 @@ class CheckListAjaxController extends AbstractActionController
             $errorMessage = 'No id given';
         }
         $checklist = $this->checkListService->getCheckListById($id);
+
+
         if (empty($checklist)) {
             $success = false;
             $errorMessage = 'Checklist not found';

@@ -13,33 +13,33 @@ $options = $checkListField->getOptionsAsArray();
 /*
  * Check if readonly is checked
  */
-$readonly = (array_key_exists('readonly',$options)? $options['readonly']: false);
+$readonly = (array_key_exists('readonly',$options??[])? $options['readonly']: false);
 
 /*
  * Check if disabled is checked
  */
-$disabled = (array_key_exists('disabled',$options)? $options['disabled']: false);
+$disabled = (array_key_exists('disabled',$options??[])? $options['disabled']: false);
 
 /*
  * Check if maxlength is checked and get the maxlength
  */
 $maxlength = (
-        array_key_exists('maxlength',$options) &&
-        array_key_exists('on',$options['maxlength'])  &&
+        array_key_exists('maxlength',$options??[]) &&
+        array_key_exists('on',$options['maxlength']??[])  &&
         $options['maxlength']['on'] == 'true'    ? $options['maxlength']['ml']: false
 );
 
 /*
  * Check if autofocus is checked
  */
-$autofocus = (array_key_exists('autofocus',$options)? $options['autofocus']: false);
+$autofocus = (array_key_exists('autofocus',$options??[])? $options['autofocus']: false);
 
 
 /*
  * Check if prependappend is checked and get the type (icon/text) and the value
  */
-$prependappend = (array_key_exists('prependappend',$options) &&
-    array_key_exists('on',$options['prependappend'])? $options['prependappend']:false);
+$prependappend = (array_key_exists('prependappend',$options??[]) &&
+    array_key_exists('on',$options['prependappend']??[])? $options['prependappend']:false);
 $prependappendPreApp= $prependappend['preapp'];
 $prependappendType = $prependappend['type'];
 $prependappendValue = $prependappend['value'];

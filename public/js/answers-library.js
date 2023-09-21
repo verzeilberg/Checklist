@@ -125,8 +125,9 @@ $(document).ready(function () {
             type: 'post',
             success: function (response) {
                 if (response.success == true) {
+                    $('div#selectedAswers input:checkbox[value="' + response.data.id + '"]').prop('checked', true);
                     var row = $('<tr>');
-                    row.append($('<td>').html('<input type="hidden" name="answers[]" value="' + response.data.id + '" />' + response.data.label));
+                    row.append($('<td>').html(response.data.label));
                     row.append($('<td>').html(response.data.value));
                     row.append($('<td class="text-center">').html('<button type="button" class="btn btn-sm btn-danger removeAnswer"><i class="fas fa-trash-alt"></i></button>'));
                     $('#answersTable > tbody#result').append(row);
@@ -142,6 +143,8 @@ $(document).ready(function () {
 
 //Function to delete answer from question
 $(document).on('click', '.removeAnswer', function () {
+    let answerId = $(this).data('answerid');
+    $('div#selectedAswers input:checkbox[value="' + answerId + '"]').prop('checked', false);
     $(this).parent('td').parent('tr').remove();
 });
 
