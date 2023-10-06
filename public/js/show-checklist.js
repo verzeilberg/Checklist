@@ -1,5 +1,11 @@
+/**
+ * Javascript file to
+ */
 $(document).ready(function () {
-    $('#checkAll').change(function (e) {
+    /**
+     * Function to check/uncheck all items by checkbox
+     */
+    $('#checkAll').change(function () {
         if ($(this).is(":checked")) {
             $("input.delete-item").each(function (i) {
                 $(this).prop('checked', true);
@@ -11,8 +17,8 @@ $(document).ready(function () {
         }
     });
 
-    /*
-     * Click funtion to remove selected items
+    /**
+     * Click function to remove selected items
      */
     $('#remove').click(function (e) {
         e.preventDefault();
@@ -50,8 +56,9 @@ $(document).ready(function () {
         }
     });
 
-
-    //Click function to remove checklistitem
+    /**
+     * Click function to remove checklistitem
+     */
     $(document).on('click', '.removeChecklistItemOpen', function () {
         var id = $(this).data('checklistitemid');
         $.ajax({
@@ -75,9 +82,9 @@ $(document).ready(function () {
         });
     });
 
-    /*
-        * Add a checklist item (open modal)
-        */
+    /**
+     * Add a checklist item (open modal)
+     */
     $('#addChecklistItemOpen').on('click', function () {
         clearFormFields();
         $(function () {
@@ -86,7 +93,7 @@ $(document).ready(function () {
     });
 
 
-    /*
+    /**
      * Edit a checklist item get checklist item and open modal
      */
     $(document).on('click', '.editChecklistItemOpen', function () {
@@ -103,7 +110,7 @@ $(document).ready(function () {
             success: function (response) {
                 $('input#checkListItemId').val(id);
                 $.each(response.itemContent[id], function (index, value) {
-                    var formField = $('form#CheckListItem input[name=' + index + ']');
+                    var formField = $('form#create-checklist-item-form input[name=' + index + ']');
                     if (formField.attr('type') == 'text' ||
                         formField.attr('type') == 'number') {
                         formField.val(value);
@@ -117,7 +124,6 @@ $(document).ready(function () {
                             } else {
                                 $(this).prop("false", true);
                             }
-
                         });
                     }
                 });
@@ -128,7 +134,9 @@ $(document).ready(function () {
         });
     });
 
-    //Click function to add/edit checklistitem
+    /**
+     * Click function to add/edit checklistitem
+     */
     $('#addChecklistItemButton').on('click', function () {
         //Get form data and serialize it
         var formData = $("form#create-checklist-item-form").serialize();
@@ -203,7 +211,6 @@ $(document).ready(function () {
                             $('#myTable > tbody#result').append(row);
 
                         } else { //If action is edit than edit a row with new values
-
                             $('#myTable').find('tr#checklistItem-' + response.checkListItemId + ' td.checklistField').each(function (index) {
                                 var checkListFieldId = $(this).data('checklistfield');
                                 var checkListItemField = response.item[checkListFieldId];
@@ -239,23 +246,22 @@ $(document).ready(function () {
                     }
                 }
             });
-        } else {
-
         }
     });
 
+    /**
+     * This functions clears al types of input fields
+     */
     function clearFormFields() {
-        $('form#CheckListItem input[type=text]').val('');
-        $('form#CheckListItem input[type=date]').val('');
-        $('form#CheckListItem input[type=number]').val('');
-        $('form#CheckListItem input[type=hidden]').val('');
-        $('form#CheckListItem textarea').val('');
-        $('form#CheckListItem input[type=radio]').prop("checked", false);
-        $('form#CheckListItem input[type=checkbox]').prop("checked", false);
-
+        $('form#create-checklist-item-form input[type=text]').val('');
+        $('form#create-checklist-item-form input[type=date]').val('');
+        $('form#create-checklist-item-form input[type=number]').val('');
+        $('form#create-checklist-item-form input[type=hidden]').val('');
+        $('form#create-checklist-item-form textarea').val('');
+        $('form#create-checklist-item-form input[type=radio]').prop("checked", false);
+        $('form#create-checklist-item-form input[type=checkbox]').prop("checked", false);
         $('#formErrorMessage').hide();
         $('#formErrorMessage').html('');
-
     }
 
 
@@ -307,12 +313,18 @@ $(document).ready(function () {
         return valid;
     }
 
+    /**
+     * Click function to open export modal
+     */
     $("#export").on("click", function () {
         $(function () {
             $('#exportFile').modal('toggle');
         });
     });
 
+    /**
+     * Click function to open import modal
+     */
     $('#importFile').on('shown.bs.modal', function () {
         $('#myInput').focus()
     })

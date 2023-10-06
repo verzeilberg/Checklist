@@ -1,6 +1,7 @@
 <?php
 namespace CheckList\Controller\Factory;
 
+use CheckList\Service\checkListAnswerService;
 use Interop\Container\ContainerInterface;
 use CheckList\Controller\CheckListItemController;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -17,6 +18,12 @@ class CheckListItemControllerFactory implements FactoryInterface
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $checkListService = new checkListService($entityManager);
         $checkListItemService = new checkListItemService($entityManager);
-        return new CheckListItemController($entityManager, $checkListService, $checkListItemService);
+        $checkListAnswerService = new checkListAnswerService($entityManager);
+        return new CheckListItemController(
+            $entityManager,
+            $checkListService,
+            $checkListItemService,
+            $checkListAnswerService
+        );
     }
 }

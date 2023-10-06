@@ -15,8 +15,6 @@ if (is_object($checklistitem)) {
     <div class="form-check">
         <?php
         foreach ($checkListField->getAnswers() AS $answer) { ?>
-
-            <?php VarDumper::dump($answer); die; ?>
             <br/>
             <input class="form-check-input" <?= ($checkListField->getRequired() == 1 ? 'required' : '') ?>
                         type="<?= $checkListField->getChecklistFieldType()->getFormType(); ?>"

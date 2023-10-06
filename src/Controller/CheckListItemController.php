@@ -6,6 +6,8 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Authentication\Result;
 use Laminas\Uri\Uri;
+use Symfony\Component\VarDumper\VarDumper;
+use function var_dump;
 
 /**
  * This controller is responsible for letting the user to log in and log out.
@@ -20,13 +22,21 @@ class CheckListItemController extends AbstractActionController {
     private $checkListService;
     private $checkListItemService;
 
+    private $checkListAnswerService;
+
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $checkListService, $checkListItemService) {
+    public function __construct(
+        $entityManager,
+        $checkListService,
+        $checkListItemService,
+        $checkListAnswerService
+    ) {
         $this->entityManager = $entityManager;
         $this->checkListService = $checkListService;
         $this->checkListItemService = $checkListItemService;
+        $this->checkListAnswerService = $checkListAnswerService;
     }
 
     /**
@@ -170,23 +180,19 @@ class CheckListItemController extends AbstractActionController {
         }
 
         $checkListFields = $checklist->getCheckListFields();
-
         if (count($checkListFields) > 0) {
-
             /** Create a new Spreadsheet Object * */
             $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-
             $worksheet = $spreadsheet->getActiveSheet();
-
-            $alphabeth = range('A', 'Z');
+            $alphabet = range('A', 'Z');
             foreach ($checkListFields AS $index => $checkListField) {
-                $worksheet->getCell($alphabeth[$index] . '1')->setValue($checkListField->getFormFieldName());
-                $worksheet->getStyle( $alphabeth[$index] . '1')->getFont()->setBold( true );
+                $worksheet->getCell($alphabet[$index] . '1')->setValue($checkListField->getFormFieldName());
+                $worksheet->getStyle( $alphabet[$index] . '1')->getFont()->setBold( true );
             }
 
             //If filters is set than apply filters
             if($filters == 1) {
-                $worksheet->setAutoFilter('A1:' . $alphabeth[$index] . '1');
+                $worksheet->setAutoFilter('A1:' . $alphabet[$index] . '1');
             }
 
             //If freeze row is set than apply freeze pane for first row
@@ -197,15 +203,11 @@ class CheckListItemController extends AbstractActionController {
             $rowStart = 2;
             foreach ($checklist->getCheckListItems() AS $index => $item) {
                 foreach ($checklist->getCheckListFields() as $fieldIndex => $fields) {
-
-                    $worksheet->getCell($alphabeth[$fieldIndex] . $rowStart)->setValue($item->getItemContent()[$fields->getFormFieldName()]);
-
-
+                    $value = $this->checkFieldType($fields, $item->getItemContent()[$fieldIndex][1]);
+                    $worksheet->getCell($alphabet[$fieldIndex] . $rowStart)->setValue($value);
                 }
                 $rowStart++;
             }
-
-
             // redirect output to client browser
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$checklist->getName().'.xls"');
@@ -216,6 +218,17 @@ class CheckListItemController extends AbstractActionController {
         } else {
             $this->flashMessenger()->addSuccessMessage('Geen velden om .xls bestand te maken');
             return $this->redirect()->toRoute('beheer/checklist');
+        }
+    }
+
+    private function checkFieldType($field, $value)
+    {
+        $formType = $field->getChecklistFieldType()->getFormType();
+        if ($formType === 'checkbox' && $value !== null) {
+                $answer = $this->checkListAnswerService->getAnswerById($value);
+                return $answer->getValue();
+        } else {
+            return $value;
         }
     }
 

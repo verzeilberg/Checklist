@@ -67,10 +67,11 @@ class checkListItemService
      * @return      void
      *
      */
-    public function setNewCheckListItem($checklistitem, $checklist, $currentUser) {
+    public function setNewCheckListItem($checklistitem, $checklist, $currentUser, $content) {
         $checklistitem->setDateCreated(new \DateTime());
         $checklistitem->setCreatedBy($currentUser);
         $checklistitem->setChecklist($checklist);
+        $checklistitem->setItemContent($content);
         
         $this->storeCheckListItem($checklistitem);
 

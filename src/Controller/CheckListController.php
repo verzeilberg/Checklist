@@ -75,10 +75,12 @@ class CheckListController extends AbstractActionController {
      */
     public function archiveAction() {
         $this->layout('layout/beheer');
-        $checklists = $this->checkListService->getArchivedChecklists();
+        $page = $this->params()->fromQuery('page', 1);
+        $query = $this->checkListService->getChecklists();
+        $checkLists = $this->checkListService->getItemsForPagination($query, $page, 10);
 
         return new ViewModel([
-            'checklists' => $checklists
+            'checklists' => $checkLists
         ]);
     }
 
@@ -267,8 +269,6 @@ class CheckListController extends AbstractActionController {
                 $this->flashMessenger()->addSuccessMessage('CheckListField opgeslagen');
 
                 return $this->redirect()->toRoute('beheer/checklist', array('action' => 'add-field', 'id' => $checklist->getId()));
-            } else {
-                VarDumper::dump($form->getMessages());
             }
         }
 

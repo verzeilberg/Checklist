@@ -3,27 +3,32 @@
         <div class="col-sm-12 col-md-12 col-xl-12">
             <div class="bg-secondary rounded  p-4">
                 <div class="row g-4">
-                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4">ITEMS FOR <?php echo $checklist->getName(); ?></h2>
+                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary">Items
+                        for checklist <?php echo $checklist->getName(); ?></h2>
                 </div>
-
-
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded  p-4">
                 <!-- Page header options -->
                 <div class="row mb-3">
                     <div class="col">
-                        <a class="btn btn-square btn-danger" id="remove" href="#">
+                        <button type="button" class="btn btn-square btn-danger" id="remove">
                             <i class="fas fa-trash-alt"></i>
-                        </a>
-                        <input type="hidden" name="checklistId" value="<?= $checklist->getId() ?>" />
+                        </button>
+                        <input type="hidden" name="checklistId" value="<?= $checklist->getId() ?>"/>
                         <!-- Button trigger modal add checklist item -->
                         <button type="button" class="btn btn-square btn-success" id="addChecklistItemOpen">
                             <i class="fas fa-plus-square"></i>
                         </button>
                         <!-- Button trigger modal export -->
-                        <button type="button" class="btn btn-square btn-light" data-bs-toggle="modal" data-bs-target="#exportModal">
+                        <button type="button" class="btn btn-square btn-light" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">
                             <i class="fas fa-upload"></i>
                         </button>
                         <!-- Button trigger modal import -->
-                        <button type="button" class="btn btn-square btn-primary" data-bs-toggle="modal" data-bs-target="#importFile">
+                        <button type="button" class="btn btn-square btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#importFile">
                             <i class="fas fa-download"></i>
                         </button>
                     </div>
@@ -52,13 +57,9 @@
 
 
                             <?php if (count($checklist->getCheckListItems()) > 0) { ?>
-                                <?php foreach ($checklist->getCheckListItems() as $item) { ?>
-
-                                    <?php
+                                <?php foreach ($checklist->getCheckListItems() as $item) {
                                     $givenAnswersForCheckListItem = $givenAnswers[$item->getId()];
                                     ?>
-
-
                                     <tr id="checklistItem-<?php echo $item->getId(); ?>">
                                         <td class="text-center"><input class="delete-item" type="checkbox"
                                                                        name="checked-items[]"
@@ -83,7 +84,7 @@
                                                         echo current($givenAnswersForCheckListItem[$fields->getId()]);
                                                     }
                                                 } else {
-                                                    echo current($givenAnswersForCheckListItem[$fields->getId()]??[]);
+                                                    echo current($givenAnswersForCheckListItem[$fields->getId()] ?? []);
                                                 }
                                                 ?>
                                             </td>
@@ -115,23 +116,34 @@
             </div>
         </div>
     </div>
+    <div class="row g-4 mt-2">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded p-4">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-xl-6">
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-xl-6 text-end">
+                        <a href="<?= $this->url('beheer/checklist', ['action' => 'index']) ?>" class="btn btn-primary"
+                           title="Annuleren">Annuleren</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<!-- Import file -->
-<?php
-echo $this->partial('check-list/partial/import-file.phtml', array('checklist' => $checklist));
-?>
-<!-- End Import file -->
-
-<!-- Export file -->
-<?php
-echo $this->partial('check-list/partial/export-file.phtml', array('checklist' => $checklist));
-?>
-<!-- End Export file -->
-
 <!-- Add checklist item-->
 <?php
 echo $this->partial('check-list/partial/add-checklist-item.phtml',
     array('checklist' => $checklist, 'form' => $form, 'checkListFields' => $checkListFields));
 ?>
 <!-- End checklist item -->
+<!-- Import file -->
+<?php
+echo $this->partial('check-list/partial/import-file.phtml', array('checklist' => $checklist));
+?>
+<!-- End Import file -->
+<!-- Export file -->
+<?php
+echo $this->partial('check-list/partial/export-file.phtml', array('checklist' => $checklist));
+?>
+<!-- End Export file -->

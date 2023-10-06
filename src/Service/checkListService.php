@@ -90,10 +90,13 @@ class checkListService
      * @return      array
      *
      */
-    public function getArchivedChecklists() {
-        $checkLists = $this->em->getRepository(CheckList::class)
-                ->findBy(['deleted' => 1], ['id' => 'ASC']);
-        return $checkLists;
+    public function getArchivedChecklists(): array
+    {
+
+        $qb = $this->em->getRepository(CheckList::class)->createQueryBuilder('c')
+            ->where('c.deleted = 1')
+            ->orderBy('c.dateCreated', 'DESC');
+        return $qb->getQuery();
     }
 
     /**

@@ -202,12 +202,12 @@ class CheckListAjaxController extends AbstractActionController
 
             if (empty($checklistItemId)) {
                 $checkListItem = $this->checkListItemService->createCheckListItem();
-                $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser());
+                $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser(), $data);
                 $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
                 $action = 'add';
             } else {
                 $checkListItem = $this->checkListItemService->getCheckListItemById($checklistItemId);
-                $checkListItem = $this->checkListItemService->updateCheckListItem($checkListItem, $checklist, $this->currentUser());
+                $checkListItem = $this->checkListItemService->setNewCheckListItem($checkListItem, $checklist, $this->currentUser(), $data);
                 $this->givenAnswerService->deleteAnswersGiven($checkListItem);
                 $answerData = $this->givenAnswerService->saveAnswers($data, $checkListItem, $checklist);
                 $action = 'update';
@@ -415,6 +415,9 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return JsonModel
+     */
     public function orderCheckListFieldsAction()
     {
         $success = true;

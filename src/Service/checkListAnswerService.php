@@ -5,6 +5,7 @@ namespace CheckList\Service;
 use CheckList\Entity\Answer;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
+use Symfony\Component\VarDumper\VarDumper;
 
 class checkListAnswerService
 {
@@ -27,8 +28,7 @@ class checkListAnswerService
     public function getAnswerById($id)
     {
         $answer = $this->em->getRepository(Answer::class)
-            ->findOneBy(['id' => $id], []);
-
+            ->findOneBy(['id' => (int) $id], []);
         return $answer;
     }
 
