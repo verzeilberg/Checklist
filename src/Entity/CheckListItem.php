@@ -58,8 +58,10 @@ class CheckListItem extends UnityOfWork {
         return json_decode($this->itemContent??'', 1);
     }
 
-    function setItemContent($itemContent) {
-        $this->itemContent = json_encode($itemContent, 1);
+    function setItemContent($itemContent): void
+    {
+        $itemContent =  json_encode($itemContent, 1);
+        $this->itemContent = urldecode($itemContent);
     }
 
     function getChecklist() {
@@ -76,17 +78,17 @@ class CheckListItem extends UnityOfWork {
     public function getAnswersGiven()
     {
 
+
+
         $answersGiven = [];
         foreach ($this->answersGiven AS $answerGiven) {
-
             $formType = $answerGiven->getChecklistField()->getChecklistFieldType()->getFormType();
-            if($formType == 'text') {
+            if($formType === 'text' || $formType === 'number' || $formType === 'textarea' ) {
                 $answersGiven[$answerGiven->getChecklistItem()->getId()][$answerGiven->getChecklistField()->getId()][] = $answerGiven->getAnswer();
             } else if($formType == 'checkbox') {
                 $answersGiven[$answerGiven->getChecklistItem()->getId()][$answerGiven->getChecklistField()->getId()][] = $answerGiven->getAnswerValue()->getId();
             }
         }
-
         return $answersGiven;
     }
 

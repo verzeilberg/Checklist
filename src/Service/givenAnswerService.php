@@ -79,14 +79,14 @@ class givenAnswerService
 
         $data = [];
         foreach ($result AS $item) {
+            if (!empty($item->getChecklistField()) && !empty($item->getAnswerValue())) {
+                if (!empty($item->getAnswer())) {
+                    $data[$checklistItemId][$item->getChecklistField()->getId()][] = $item->getAnswer();
+                } else {
+                    $data[$checklistItemId][$item->getChecklistField()->getId()][] = $item->getAnswerValue()->getId();
+                }
 
-
-            if (!empty($item->getAnswer())) {
-                $data[$checklistItemId][$item->getChecklistField()->getId()][] = $item->getAnswer();
-            } else {
-                $data[$checklistItemId][$item->getChecklistField()->getId()][] = $item->getAnswerValue()->getId();
             }
-
         }
 
         return $data;

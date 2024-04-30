@@ -16,7 +16,7 @@ $options = $checkListField->getOptionsAsArray();
 /*
  * Check if measurements is checked and get width, height and type (% or px)
  */
-$measurements = (array_key_exists('measurements',$options) &&
+$measurements = (array_key_exists('measurements',$options??[]) &&
 array_key_exists('on',$options['measurements'])? $options['measurements']:false);
 $measurementsWidth = $measurements['width'];
 $measurementsHeight = $measurements['height'];
@@ -32,7 +32,7 @@ if($measurements) {
 /*
  * Check if resized is checked
  */
-$resize = (array_key_exists('resize',$options)? $options['resize']: false);
+$resize = (array_key_exists('resize',$options??[])? $options['resize']: false);
 if(!$resize) {
     $resizeStyle = 'resize:none;';
 } else {

@@ -110,21 +110,37 @@ $(document).ready(function () {
             success: function (response) {
                 $('input#checkListItemId').val(id);
                 $.each(response.itemContent[id], function (index, value) {
-                    var formField = $('form#create-checklist-item-form input[name=' + index + ']');
-                    if (formField.attr('type') == 'text' ||
-                        formField.attr('type') == 'number') {
+                    let formField = $('form#create-checklist-item-form input[name=' + index + ']');
+
+                    if (formField.attr('type') === undefined)
+                    {
+                        formField = $('form#create-checklist-item-form textarea[name=' + index + ']');
+                    }
+                    console.log(formField);
+
+
+                    if (
+                        formField.attr('type') === 'text' ||
+                        formField.attr('type') === 'number'
+                        )
+                    {
                         formField.val(value);
-                    } else if (formField.attr('type') == 'checkbox' ||
-                        formField.attr('type') == 'radio') {
+                    } else if (
+                        formField.attr('type') === 'checkbox' ||
+                        formField.attr('type') === 'radio'
+                    ) {
                         $.each(formField, function () {
-                            var checkBoxValue = parseInt($(this).val());
-                            var arrayValues = _.toArray(value);
+                            let checkBoxValue = parseInt($(this).val());
+                            let arrayValues = _.toArray(value);
                             if (_.indexOf(arrayValues, checkBoxValue) > -1) {
                                 $(this).prop("checked", true);
                             } else {
                                 $(this).prop("false", true);
                             }
                         });
+                    } else if (formField.is( "textarea" )) {
+                        console.log(value);
+                        formField.val(value);
                     }
                 });
                 $(function () {
@@ -139,8 +155,8 @@ $(document).ready(function () {
      */
     $('#addChecklistItemButton').on('click', function () {
         //Get form data and serialize it
-        var formData = $("form#create-checklist-item-form").serialize();
-        var valid = validateForm('create-checklist-item-form');
+        let formData = $("form#create-checklist-item-form").serialize();
+        let valid = validateForm('create-checklist-item-form');
         let checklistId = $('input[name="checklistId"]').val();
         if (valid == true) {
             //Ajax call to add or edit checklist item. Based on given id.
@@ -185,6 +201,8 @@ $(document).ready(function () {
 
                                     if (itemFormType == 'text') {
                                         content = checkListItemField.type.text;
+                                    } else if (itemFormType === 'textarea') {
+                                        content = checkListItemField.type.textarea;
                                     } else if (itemFormType == 'number') {
                                         content = checkListItemField.type.number;
                                     } else if (itemFormType == 'radio') {
@@ -212,22 +230,24 @@ $(document).ready(function () {
 
                         } else { //If action is edit than edit a row with new values
                             $('#myTable').find('tr#checklistItem-' + response.checkListItemId + ' td.checklistField').each(function (index) {
-                                var checkListFieldId = $(this).data('checklistfield');
-                                var checkListItemField = response.item[checkListFieldId];
-                                var content = '';
+                                let checkListFieldId = $(this).data('checklistfield');
+                                let checkListItemField = response.item[checkListFieldId];
+                                let content = '';
                                 if (typeof checkListItemField != 'undefined') {
 
-                                    var itemFormType = Object.keys(checkListItemField.type)[0];
+                                    let itemFormType = Object.keys(checkListItemField.type)[0];
 
-                                    if (itemFormType == 'text') {
+                                    if (itemFormType === 'text') {
                                         content = checkListItemField.type.text;
-                                    } else if (itemFormType == 'number') {
+                                    } else if (itemFormType === 'textarea') {
+                                        content = checkListItemField.type.textarea;
+                                    } else if (itemFormType === 'number') {
                                         content = checkListItemField.type.number;
-                                    } else if (itemFormType == 'radio') {
+                                    } else if (itemFormType === 'radio') {
                                         content += '<i class="fas fa-check-circle"></i> ' + checkListItemField.type.radio;
-                                    } else if (itemFormType == 'select') {
+                                    } else if (itemFormType === 'select') {
                                         content += checkListItemField.type.select;
-                                    } else if (itemFormType == 'checkbox') {
+                                    } else if (itemFormType === 'checkbox') {
                                         $.each(checkListItemField.type.checkbox, function (index, value) {
                                             content += '<i class="fas fa-check-square"></i> ' + value + '<br/>'
                                         });

@@ -76,11 +76,11 @@
                                                         echo '<i class="fas fa-check-square"></i> ' . $answer . '<br/>';
                                                     }
                                                 } elseif ($fields->getChecklistFieldType()->getFormType() == 'radio') {
-                                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
+                                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()] ?? []))) {
                                                         echo '<i class="fas fa-check-circle"></i> ' . current($givenAnswersForCheckListItem[$fields->getId()]);
                                                     }
                                                 } elseif ($fields->getChecklistFieldType()->getFormType() == 'select') {
-                                                    if (!empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
+                                                    if (isset($givenAnswersForCheckListItem[$fields->getId()]) && !empty(current($givenAnswersForCheckListItem[$fields->getId()]))) {
                                                         echo current($givenAnswersForCheckListItem[$fields->getId()]);
                                                     }
                                                 } else {

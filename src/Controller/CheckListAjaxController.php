@@ -134,7 +134,7 @@ class CheckListAjaxController extends AbstractActionController
     }
 
 
-    public function getChecklistItemAction()
+    public function getChecklistItemAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';
@@ -143,17 +143,14 @@ class CheckListAjaxController extends AbstractActionController
             $success = false;
             $errorMessage = 'No id given';
         }
+
         $checkListItem = $this->checkListItemService->getCheckListItemById($id);
         if (empty($checkListItem)) {
             $success = false;
             $errorMessage = 'ChecklistItem not found';
         }
 
-        $checkList = $checkListItem->getChecklist();
-        $checkListFields = $checkList->getCheckListFields();
-
         $answers = $checkListItem->getAnswersGiven();
-        $answers = $this->givenAnswerService->getGivenAnswersByChecklisItemtId($checkListItem->getId());
 
         return new JsonModel([
             'success' => $success,
@@ -161,10 +158,9 @@ class CheckListAjaxController extends AbstractActionController
             'itemContent' => $answers,
             'checkListItemId' => $checkListItem->getId()
         ]);
-
     }
 
-    public function addChecklistItemAction()
+    public function addChecklistItemAction(): JsonModel
     {
         //Set variables
         $success = true;
@@ -180,9 +176,8 @@ class CheckListAjaxController extends AbstractActionController
             $success = false;
             $errorMessage = 'No id given';
         }
+
         $checklist = $this->checkListService->getCheckListById($id);
-
-
         if (empty($checklist)) {
             $success = false;
             $errorMessage = 'Checklist not found';
@@ -191,7 +186,6 @@ class CheckListAjaxController extends AbstractActionController
         $data = [];
         foreach ($formDataArray AS $formField) {
             $data[] = explode('=', $formField);
-
         }
 
         $checklistItemId = array_shift($data)[1];
@@ -229,7 +223,7 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    public function deleteItemsAction()
+    public function deleteItemsAction(): JsonModel
     {
         $error = false;
         $checklistIds = $_POST["itemsToDelete"];
@@ -259,7 +253,7 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    public function deleteItemAction()
+    public function deleteItemAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';
@@ -281,7 +275,7 @@ class CheckListAjaxController extends AbstractActionController
     }
 
 
-    public function addAnswerAction()
+    public function addAnswerAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';
@@ -319,7 +313,7 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    public function checkIfAnswerExcistAction()
+    public function checkIfAnswerExcistAction(): JsonModel
     {
         $success = true;
         $answerExcists = false;
@@ -344,7 +338,7 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    public function searchAnswerAction()
+    public function searchAnswerAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';
@@ -366,7 +360,7 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    public function searchAnswerOnIndexAction()
+    public function searchAnswerOnIndexAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';
@@ -391,7 +385,7 @@ class CheckListAjaxController extends AbstractActionController
         ]);
     }
 
-    public function addAnswerToQuestionAction()
+    public function addAnswerToQuestionAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';
@@ -418,7 +412,7 @@ class CheckListAjaxController extends AbstractActionController
     /**
      * @return JsonModel
      */
-    public function orderCheckListFieldsAction()
+    public function orderCheckListFieldsAction(): JsonModel
     {
         $success = true;
         $errorMessage = '';

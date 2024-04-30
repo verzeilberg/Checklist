@@ -6,6 +6,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Authentication\Result;
 use Laminas\Uri\Uri;
+use PhpOffice\PhpSpreadsheet\Exception;
 use Symfony\Component\VarDumper\VarDumper;
 use function var_dump;
 
@@ -16,7 +17,7 @@ class CheckListItemController extends AbstractActionController {
 
     /**
      * Entity manager.
-     * @var Doctrine\ORM\EntityManager 
+     * @var Doctrine\ORM\EntityManager
      */
     private $entityManager;
     private $checkListService;
@@ -41,8 +42,8 @@ class CheckListItemController extends AbstractActionController {
 
     /**
      * Index action to show checklistst
-     * 
-     * @return Array()    
+     *
+     * @return Array()
      */
     public function indexAction() {
         $this->layout('layout/beheer');
@@ -53,7 +54,7 @@ class CheckListItemController extends AbstractActionController {
     }
 
     /**
-     * Add action to add a new cheklistitem     
+     * Add action to add a new cheklistitem
      */
     public function addAction() {
         $this->layout('layout/beheer');
@@ -164,6 +165,7 @@ class CheckListItemController extends AbstractActionController {
      * Index action to show checklistst
      *
      * @return Array()
+     * @throws Exception
      */
     public function exportListAction() {
         $this->layout('layout/beheer');
@@ -208,6 +210,8 @@ class CheckListItemController extends AbstractActionController {
                 }
                 $rowStart++;
             }
+
+
             // redirect output to client browser
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$checklist->getName().'.xls"');
